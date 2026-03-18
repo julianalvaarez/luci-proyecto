@@ -34,8 +34,7 @@ export default function SlotSelector() {
   }, [selectedDate, state.modality, state.locationId]);
 
   const handleSelectSlot = (slot: any) => {
-    // In a real app, internal ID would be used
-    updateState({ slotId: format(new Date(slot.start_time), "yyyy-MM-dd'T'HH:mm:ss") });
+    updateState({ slotId: slot.start_time });
     setStep('contact');
   };
 

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { generateSlotsForDate } from '@/services/slotService';
-import { format, parseISO } from 'date-fns';
+import { fromZonedTime } from 'date-fns-tz';
+
+const ARG_TZ = 'America/Argentina/Buenos_Aires';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -14,7 +16,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const selectedDate = parseISO(dateStr);
+    const selectedDate = fromZonedTime(dateStr, ARG_TZ);
     
     // 1. Fetch Availability Rules for this day and modality/location
     const query = supabase

@@ -1,4 +1,7 @@
-import { addMinutes, format, parse, startOfDay, addDays, isBefore, isAfter, set } from 'date-fns';
+import { addMinutes, startOfDay, isBefore, set } from 'date-fns';
+import { fromZonedTime, toZonedTime } from 'date-fns-tz';
+
+const ARG_TZ = 'America/Argentina/Buenos_Aires';
 
 export interface AvailabilityRule {
     id: string;
@@ -16,13 +19,16 @@ export interface GeneratedSlot {
 
 /**
  * Generates slots for a specific date based on availability rules.
+ * Uses Argentina timezone to ensure consistency between server and client.
  */
 export function generateSlotsForDate(
     date: Date,
     rules: AvailabilityRule[],
     durationMinutes: number
 ): GeneratedSlot[] {
-    const dayOfWeek = date.getDay();
+    // 1. Get the target date in Argentina timezone
+    const zonedDate = toZonedTime(date, ARG_TZ);
+    const dayOfWeek = zonedDate.getDay();
     const relevantRules = rules.filter((rule) => rule.day_of_week === dayOfWeek);
 
     const slots: GeneratedSlot[] = [];
@@ -31,8 +37,9 @@ export function generateSlotsForDate(
         const [startH, startM] = rule.start_time.split(':').map(Number);
         const [endH, endM] = rule.end_time.split(':').map(Number);
 
-        let currentStart = set(startOfDay(date), { hours: startH, minutes: startM });
-        const ruleEnd = set(startOfDay(date), { hours: endH, minutes: endM });
+        // 2. Create local times (HH:mm) in the target timezone
+        let currentStart = fromZonedTime(set(startOfDay(zonedDate), { hours: startH, minutes: startM }), ARG_TZ);
+        const ruleEnd = fromZonedTime(set(startOfDay(zonedDate), { hours: endH, minutes: endM }), ARG_TZ);
 
         while (isBefore(addMinutes(currentStart, durationMinutes), ruleEnd) ||
             addMinutes(currentStart, durationMinutes).getTime() === ruleEnd.getTime()) {
