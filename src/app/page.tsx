@@ -3,22 +3,21 @@ import { ArrowRight, Calendar, MapPin, Video, CheckCircle } from 'lucide-react';
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen relative">
+    <div className="flex flex-col min-h-screen relative overflow-x-hidden">
       {/* Global Background Wrapper - Fixed to the viewport */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-white">
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <div 
-          className="absolute inset-0 opacity-45"
+          className="absolute inset-0 opacity-45 sm:opacity-40"
           style={{
             backgroundImage: "url('/fondo.png')",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            backgroundAttachment: 'fixed'
           }}
         />
-        {/* Fusion / Gradient Overlays */}
-        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-white/10 via-white/40 to-white" />
-        <div className="absolute inset-0 z-[1] bg-gradient-to-r from-white via-white/20 to-white opacity-60" />
-        <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle,transparent_10%,white_90%)]" />
+        {/* Fusion / Gradient Overlays - Adjusted for mobile visibility */}
+        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-white/10 via-white/50 to-white" />
+        <div className="absolute inset-0 z-[1] bg-gradient-to-r from-white/20 via-transparent to-white/20 sm:from-white sm:via-white/20 sm:to-white opacity-60" />
+        <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle,transparent_0%,white_120%)] sm:bg-[radial-gradient(circle,transparent_10%,white_90%)]" />
       </div>
 
       <header className="px-4 lg:px-6 h-16 flex items-center glass sticky top-0 z-50 border-b border-white/20">
