@@ -3,8 +3,25 @@ import { ArrowRight, Calendar, MapPin, Video, CheckCircle } from 'lucide-react';
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="px-4 lg:px-6 h-16 flex items-center border-b glass sticky top-0 z-50">
+    <div className="flex flex-col min-h-screen relative">
+      {/* Global Background Wrapper - Fixed to the viewport */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-white">
+        <div 
+          className="absolute inset-0 opacity-45"
+          style={{
+            backgroundImage: "url('/fondo.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed'
+          }}
+        />
+        {/* Fusion / Gradient Overlays */}
+        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-white/10 via-white/40 to-white" />
+        <div className="absolute inset-0 z-[1] bg-gradient-to-r from-white via-white/20 to-white opacity-60" />
+        <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle,transparent_10%,white_90%)]" />
+      </div>
+
+      <header className="px-4 lg:px-6 h-16 flex items-center glass sticky top-0 z-50 border-b border-white/20">
         <Link className="flex items-center justify-center" href="/">
           <span className="font-display font-bold text-2xl text-brand-primary">Lic. Luciana Cresia</span>
         </Link>
@@ -14,30 +31,31 @@ export default function LandingPage() {
           </Link>
         </nav>
       </header>
-      <main className="flex-1">
-        <section className="w-full min-h-[calc(100vh-64px)] flex items-center py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-white to-emerald-50">
-          <div className="container px-4 md:px-6 mx-auto">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="inline-block rounded-full bg-emerald-100 px-3 py-1 text-sm text-emerald-700 font-medium">
+
+      <main className="flex-1 relative z-10">
+        <section className="w-full min-h-[calc(100vh-64px)] flex items-center py-12 md:py-24 lg:py-32 xl:py-48 overflow-hidden bg-transparent">
+          <div className="container px-4 md:px-6 mx-auto relative z-10">
+            <div className="flex flex-col items-center space-y-6 text-center">
+              <div className="inline-block rounded-full bg-emerald-100/90 backdrop-blur-sm border border-emerald-200 px-4 py-1.5 text-sm text-emerald-800 font-bold shadow-sm">
                 Reserva tu turno online en segundos
               </div>
-              <h1 className="text-4xl font-display font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
-                Tu salud merece un <span className="text-brand-primary">plan a medida</span>
+              <h1 className="text-4xl font-display font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-8xl max-w-4xl drop-shadow-sm text-gray-900 leading-[1.1]">
+                Tu salud merece un <span className="text-brand-primary drop-shadow-sm">plan a medida</span>
               </h1>
-              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              <p className="mx-auto max-w-[750px] text-gray-700 md:text-xl font-medium leading-relaxed drop-shadow-sm px-4">
                 Agenda tu consulta nutricional de forma simple y rápida. Modalidad online o presencial en nuestras sucursales.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 mt-8">
+              <div className="flex flex-col sm:flex-row gap-4 mt-10">
                 <Link
                   href="/booking"
-                  className="inline-flex h-12 items-center justify-center rounded-full bg-brand-primary px-8 text-sm font-medium text-white shadow transition-all hover:bg-brand-secondary hover:scale-105 active:scale-95 cursor-pointer"
+                  className="inline-flex h-14 items-center justify-center rounded-full bg-brand-primary px-10 text-base font-bold text-white shadow-xl transition-all hover:bg-brand-secondary hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   Agendar Turno
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
                 <Link
                   href="#services"
-                  className="inline-flex h-12 items-center justify-center rounded-full border border-gray-200 bg-white px-8 text-sm font-medium shadow-sm transition-all hover:bg-gray-50 cursor-pointer"
+                  className="inline-flex h-14 items-center justify-center rounded-full border border-gray-200 bg-white/80 backdrop-blur-md px-10 text-base font-bold shadow-lg transition-all hover:bg-white hover:scale-105 cursor-pointer"
                 >
                   Ver Servicios
                 </Link>
@@ -47,7 +65,7 @@ export default function LandingPage() {
         </section>
 
         {/* Sobre Mí Section */}
-        <section className="w-full py-12 md:py-20 bg-white">
+        <section className="w-full py-12 md:py-20 bg-transparent relative z-10">
           <div className="container px-4 md:px-6 mx-auto max-w-5xl">
             <div className="bg-white rounded-[32px] p-6 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 flex flex-col md:flex-row gap-8 md:gap-12 items-center md:items-start">
 
@@ -97,7 +115,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="services" className="w-full py-12 md:py-24 lg:py-32">
+        <section id="services" className="w-full py-12 md:py-24 lg:py-32 bg-transparent relative z-10">
           <div className="container px-4 md:px-6 mx-auto">
             <h2 className="text-3xl font-display font-bold text-center mb-12">Nuestros Servicios</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
