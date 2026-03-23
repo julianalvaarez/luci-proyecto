@@ -28,7 +28,7 @@ export default function PresencialPage() {
 
       <main className="flex-1 px-4 max-w-lg lg:max-w-5xl mx-auto w-full pb-24 lg:pb-32">
         {/* Pricing Card */}
-        <div className="bg-emerald-50 rounded-2xl p-5 mb-8 border border-emerald-100 flex justify-between items-center shadow-sm">
+        <div className="bg-emerald-50 rounded-2xl p-5 mt-8 mb-8 border border-emerald-100 flex justify-between items-center shadow-sm">
           <div>
             <p className="text-[10px] text-brand-primary uppercase font-bold tracking-widest">INVERSIÓN POR SESIÓN</p>
             <p className="text-4xl font-bold text-brand-primary mt-1">$55.000</p>
