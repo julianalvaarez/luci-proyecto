@@ -18,9 +18,9 @@ export default function ManualAppointmentForm({ onClose, onSuccess, initialData 
   const [locations, setLocations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  
+
   const isEdit = !!initialData;
-  
+
   const { register, handleSubmit, watch, formState: { errors } } = useForm({
     defaultValues: isEdit ? {
       firstName: initialData.patients?.first_name || '',
@@ -59,7 +59,7 @@ export default function ManualAppointmentForm({ onClose, onSuccess, initialData 
     try {
       const start = new Date(`${data.date}T${data.time}:00`);
       const end = new Date(start.getTime() + 60 * 60 * 1000);
-      
+
       const locationId = selectedService?.modality === 'online' ? null : data.location_id;
 
       // 1. Check if the slot is already occupied
@@ -78,10 +78,10 @@ export default function ManualAppointmentForm({ onClose, onSuccess, initialData 
       const requestedStart = start.toISOString();
       const isTimeOccupied = bookedSlots?.some(booked => {
         if (isEdit && booked.id === initialData.id) return false; // Ignore current appointment if editing
-        
+
         const slotData = Array.isArray(booked.slots) ? booked.slots[0] : booked.slots;
         if (!slotData) return false;
-        
+
         const bookedStart = new Date(slotData.start_time).toISOString();
         return bookedStart === requestedStart;
       });
@@ -101,7 +101,7 @@ export default function ManualAppointmentForm({ onClose, onSuccess, initialData 
             phone: data.phone,
           })
           .eq('id', initialData.patient_id);
-          
+
         if (pError) throw pError;
 
         // 2. Update Slot
@@ -112,7 +112,7 @@ export default function ManualAppointmentForm({ onClose, onSuccess, initialData 
             end_time: end.toISOString()
           })
           .eq('id', initialData.slot_id);
-          
+
         if (sError) throw sError;
 
         // 3. Update Appointment
@@ -244,11 +244,6 @@ export default function ManualAppointmentForm({ onClose, onSuccess, initialData 
               <input type="time" {...register('time', { required: true })} className="w-full h-11 px-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-brand-primary" />
             </div>
           </div>
-
-            <div className="flex items-center gap-2 pt-2">
-              <input type="checkbox" {...register('first_time')} id="first_time" className="h-4 w-4 text-brand-primary focus:ring-brand-primary border-gray-300 rounded" />
-              <label htmlFor="first_time" className="text-sm font-medium text-gray-700 underline decoration-emerald-200 underline-offset-4 cursor-pointer">¿Es la primera consulta del paciente?</label>
-            </div>
 
           <div className="space-y-1">
             <label className="text-sm font-bold text-gray-400 uppercase">Notas (Opcional)</label>

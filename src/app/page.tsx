@@ -6,7 +6,7 @@ export default function LandingPage() {
     <div className="flex flex-col min-h-screen relative overflow-x-hidden">
       {/* Global Background Wrapper - Fixed to the viewport */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div 
+        <div
           className="absolute inset-0 opacity-45 sm:opacity-40"
           style={{
             backgroundImage: "url('/fondo.png')",
@@ -86,12 +86,19 @@ export default function LandingPage() {
                 <h2 className="hidden md:block text-3xl md:text-4xl font-bold text-gray-900 mb-8 font-display">Sobre Mí</h2>
 
                 <p className="text-gray-600 text-base md:text-lg leading-relaxed mb-6 text-center md:text-left">
-                  Especialista en Nutrición Clínica y Deportiva con más de 8 años de experiencia ayudando a personas a transformar su relación con la comida de manera sostenible.
+                  Especialista en Nutrición Clínica y Gastronomica con más de 6 años de experiencia ayudando a personas a transformar su relación con la comida de manera sostenible.
                 </p>
 
-                <div className="flex items-center justify-center md:justify-start gap-2 mb-8 text-gray-500 text-sm">
-                  <CheckCircle className="h-4 w-4 md:h-5 md:w-5 bg-gray-500 text-white rounded-full p-0.5" />
-                  <span className="italic text-gray-500 font-medium md:text-base">Matrícula Profesional: 12345</span>
+                <div className='flex flex-col items-center md:flex-row md:justify-between '>
+                  <div className="flex items-center justify-center md:justify-start gap-2 mb-3 md:mb-8 text-gray-500 text-sm">
+                    <CheckCircle className="h-4 w-4 md:h-5 md:w-5 bg-gray-500 text-white rounded-full p-0.5" />
+                    <span className="italic text-gray-500 font-medium md:text-base">Matrícula Nacional: 12135</span>
+                  </div>
+                  <div className="flex items-center justify-center md:justify-start gap-2 mb-8  text-gray-500 text-sm">
+                    <CheckCircle className="h-4 w-4 md:h-5 md:w-5 bg-gray-500 text-white rounded-full p-0.5" />
+                    <span className="italic text-gray-500 font-medium md:text-base">Matrícula Provincial: 6054</span>
+                  </div>
+
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 md:gap-6 border-t border-gray-100 pt-8 w-full">
