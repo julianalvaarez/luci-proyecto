@@ -20,9 +20,28 @@ interface AdminNotificationEmailProps {
   date: string;
   time: string;
   modality: string;
+  intakeData?: {
+    age?: number;
+    weight?: number;
+    height?: number;
+    objective?: string;
+    diagnosed_diseases?: string;
+    medications?: string;
+    physical_activity?: string;
+    previous_nutritionist_visit?: string | boolean;
+  };
 }
 
-export const AdminNotificationEmail = ({ patientName, patientEmail, patientPhone, serviceName, date, time, modality, }: AdminNotificationEmailProps) => {
+export const AdminNotificationEmail = ({ 
+  patientName, 
+  patientEmail, 
+  patientPhone, 
+  serviceName, 
+  date, 
+  time, 
+  modality,
+  intakeData
+}: AdminNotificationEmailProps) => {
   return (
     <Html>
       <Head />
@@ -47,6 +66,32 @@ export const AdminNotificationEmail = ({ patientName, patientEmail, patientPhone
               <Text style={detailText}><strong>Fecha:</strong> {date}</Text>
               <Text style={detailText}><strong>Hora:</strong> {time}</Text>
             </div>
+
+            {intakeData && (
+              <div style={card}>
+                <Heading style={h2}>Ficha de Primera Consulta</Heading>
+                <div style={grid}>
+                  <div style={gridItem}>
+                    <Text style={label}>Edad</Text>
+                    <Text style={value}>{intakeData.age ?? '-'} años</Text>
+                  </div>
+                  <div style={gridItem}>
+                    <Text style={label}>Peso</Text>
+                    <Text style={value}>{intakeData.weight ?? '-'} kg</Text>
+                  </div>
+                  <div style={gridItem}>
+                    <Text style={label}>Altura</Text>
+                    <Text style={value}>{intakeData.height ?? '-'} cm</Text>
+                  </div>
+                </div>
+                <Hr style={innerHr} />
+                <Text style={detailText}><strong>Objetivo:</strong> {intakeData.objective || '-'}</Text>
+                <Text style={detailText}><strong>Enfermedades:</strong> {intakeData.diagnosed_diseases || '-'}</Text>
+                <Text style={detailText}><strong>Medicamentos:</strong> {intakeData.medications || '-'}</Text>
+                <Text style={detailText}><strong>Act. Física:</strong> {intakeData.physical_activity || '-'}</Text>
+                <Text style={detailText}><strong>¿Consultó antes?:</strong> {intakeData.previous_nutritionist_visit === 'si' ? 'Sí' : 'No'}</Text>
+              </div>
+            )}
 
             <Text style={text}>
               Puedes ver más detalles y gestionar tus turnos en el panel de administración.
@@ -93,6 +138,13 @@ const h1 = {
   margin: "0",
 };
 
+const h2 = {
+  color: "#064e3b",
+  fontSize: "18px",
+  fontWeight: "bold",
+  margin: "0 0 15px",
+};
+
 const section = {
   padding: "24px 32px",
 };
@@ -126,6 +178,36 @@ const innerHr = {
 const hr = {
   borderColor: "#e6ebf1",
   margin: "20px 0",
+};
+
+const grid = {
+  display: "flex",
+  flexWrap: "wrap" as const,
+  gap: "10px",
+  marginBottom: "15px",
+};
+
+const gridItem = {
+  flex: "1 0 30%",
+  backgroundColor: "#ffffff",
+  padding: "10px",
+  borderRadius: "8px",
+  border: "1px solid #e6ebf1",
+};
+
+const label = {
+  fontSize: "10px",
+  fontWeight: "bold" as const,
+  color: "#8898aa",
+  textTransform: "uppercase" as const,
+  margin: "0 0 4px",
+};
+
+const value = {
+  fontSize: "13px",
+  fontWeight: "600" as const,
+  color: "#064e3b",
+  margin: "0",
 };
 
 const footer = {

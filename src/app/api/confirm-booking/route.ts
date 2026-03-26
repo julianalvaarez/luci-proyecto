@@ -71,7 +71,8 @@ export async function POST(req: NextRequest) {
         if (bookingData.isFirstTime && bookingData.intakeData) {
             await supabase.from('intake_forms').insert({
                 appointment_id: appointment.id,
-                ...bookingData.intakeData
+                ...bookingData.intakeData,
+                age: bookingData.contactData?.age // Ensure age is saved even if removed from intake form UI
             });
         }
 
@@ -101,7 +102,8 @@ export async function POST(req: NextRequest) {
                     serviceName: serviceName,
                     date: dateStr,
                     time: timeStr,
-                    modality: bookingData.modality
+                    modality: bookingData.modality,
+                    intakeData: bookingData.isFirstTime ? bookingData.intakeData : undefined
                 })
             );
 

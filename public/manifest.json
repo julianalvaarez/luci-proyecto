@@ -1,0 +1,32 @@
+{
+    "name": "Lic. Luciana Cresia",
+    "short_name": "Nutricion",
+    "description": "Lic. Luciana Cresia Nutricionista Clínica",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#000000",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "/logo-luci.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/logo-luci.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/logo-luci.png",
+            "sizes": "1024x1024",
+            "type": "image/png"
+        },
+        {
+            "src": "/logo-luci.png",
+            "sizes": "1024x1024",
+            "type": "image/png"
+        }
+    ]
+}

@@ -20,10 +20,13 @@ interface BookingState {
   intakeData?: {
     weight?: number;
     height?: number;
+    age?: number;
     objective?: string;
-    illnesses?: string;
-    medication?: string;
+    diagnosed_diseases?: string;
+    medications?: string;
     physical_activity?: string;
+    blood_analysis_url?: string;
+    previous_nutritionist_visit?: boolean;
   };
   slotId?: string;
   contactData?: {

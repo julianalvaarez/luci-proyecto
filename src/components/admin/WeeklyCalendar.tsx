@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Plus, MapPin, Video, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, MapPin, Video, Loader2, FileUp } from 'lucide-react';
 import { format, startOfWeek, addDays, isSameDay, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { supabase } from '@/lib/supabase';
@@ -127,7 +127,7 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
             {/* Appointment Details Modal */}
             {selectedAppt && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[110] p-4 text-left">
-                    <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                    <div className="bg-white w-full max-h-[90vh] overflow-y-auto max-w-lg rounded-3xl shadow-2xl animate-in fade-in zoom-in duration-200">
                         <div className="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                             <h3 className="text-xl font-bold">Detalles del Turno</h3>
                             <button onClick={() => setSelectedAppt(null)} className="p-2 hover:bg-white rounded-full transition-all text-gray-400 hover:text-gray-700">
@@ -171,12 +171,16 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
                                 </div>
 
                                 {selectedAppt.intake_forms && selectedAppt.intake_forms.length > 0 && (
-                                    <div className="mt-4 p-5 border border-emerald-100 bg-emerald-50 rounded-2xl space-y-3">
+                                    <div className="mt-4 p-5 border border-emerald-100 bg-emerald-50 rounded-3xl space-y-4">
                                         <div className="flex items-center gap-2 mb-2">
                                             <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse" />
-                                            <h5 className="font-bold text-emerald-800 uppercase text-xs tracking-wider">Ficha de Primer Consulta</h5>
+                                            <h5 className="font-bold text-emerald-800 uppercase text-xs tracking-wider">Ficha de Primera Consulta</h5>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-4 text-sm">
+                                            <div className="flex flex-col">
+                                                <span className="text-gray-500 text-[10px] font-bold uppercase">Edad</span>
+                                                <span className="font-semibold text-emerald-900">{selectedAppt.intake_forms[0].age || '-'} años</span>
+                                            </div>
                                             <div className="flex flex-col">
                                                 <span className="text-gray-500 text-[10px] font-bold uppercase">Peso</span>
                                                 <span className="font-semibold text-emerald-900">{selectedAppt.intake_forms[0].weight ? `${selectedAppt.intake_forms[0].weight} kg` : '-'}</span>
@@ -185,24 +189,38 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
                                                 <span className="text-gray-500 text-[10px] font-bold uppercase">Altura</span>
                                                 <span className="font-semibold text-emerald-900">{selectedAppt.intake_forms[0].height ? `${selectedAppt.intake_forms[0].height} cm` : '-'}</span>
                                             </div>
-                                            <div className="col-span-2 flex flex-col pt-1 border-t border-emerald-100/50">
-                                                <span className="text-gray-500 text-[10px] font-bold uppercase">Objetivo</span>
+                                            <div className="col-span-full flex flex-col pt-1 border-t border-emerald-100/50">
+                                                <span className="text-gray-500 text-[10px] font-bold uppercase">Objetivo Principal</span>
                                                 <span className="font-medium text-emerald-900 leading-tight">{selectedAppt.intake_forms[0].objective || '-'}</span>
                                             </div>
-                                            <div className="col-span-2 flex flex-col pt-1 border-t border-emerald-100/50">
+                                            <div className="col-span-full flex flex-col pt-1 border-t border-emerald-100/50">
                                                 <span className="text-gray-500 text-[10px] font-bold uppercase">Actividad Física</span>
                                                 <span className="font-medium text-emerald-900 leading-tight">{selectedAppt.intake_forms[0].physical_activity || '-'}</span>
                                             </div>
-                                            {selectedAppt.intake_forms[0].illnesses && (
-                                                <div className="col-span-2 flex flex-col pt-1 border-t border-emerald-100/50">
-                                                    <span className="text-gray-500 text-[10px] font-bold uppercase">Enfermedades/Alergias</span>
-                                                    <span className="font-medium text-emerald-900 leading-tight">{selectedAppt.intake_forms[0].illnesses}</span>
-                                                </div>
-                                            )}
-                                            {selectedAppt.intake_forms[0].medication && (
-                                                <div className="col-span-2 flex flex-col pt-1 border-t border-emerald-100/50">
-                                                    <span className="text-gray-500 text-[10px] font-bold uppercase">Medicación</span>
-                                                    <span className="font-medium text-emerald-900 leading-tight">{selectedAppt.intake_forms[0].medication}</span>
+                                            <div className="col-span-full flex flex-col pt-1 border-t border-emerald-100/50">
+                                                <span className="text-gray-500 text-[10px] font-bold uppercase">Enfermedades Diagnosticadas</span>
+                                                <span className="font-medium text-emerald-900 leading-tight">{selectedAppt.intake_forms[0].diagnosed_diseases || '-'}</span>
+                                            </div>
+                                            <div className="col-span-full flex flex-col pt-1 border-t border-emerald-100/50">
+                                                <span className="text-gray-500 text-[10px] font-bold uppercase">Medicamentos</span>
+                                                <span className="font-medium text-emerald-900 leading-tight">{selectedAppt.intake_forms[0].medications || '-'}</span>
+                                            </div>
+                                            <div className="col-span-full flex flex-col pt-1 border-t border-emerald-100/50">
+                                                <span className="text-gray-500 text-[10px] font-bold uppercase">¿Consultó nutricionista antes?</span>
+                                                <span className="font-medium text-emerald-900 leading-tight">{selectedAppt.intake_forms[0].previous_nutritionist_visit === true ? 'Sí' : 'No'}</span>
+                                            </div>
+                                            
+                                            {selectedAppt.intake_forms[0].blood_analysis_url && (
+                                                <div className="col-span-full pt-3">
+                                                    <a 
+                                                        href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/blood-analysis/${selectedAppt.intake_forms[0].blood_analysis_url}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center justify-center gap-2 w-full py-3 bg-white border border-emerald-100 text-brand-primary rounded-2xl font-bold hover:bg-emerald-100 transition-all text-xs"
+                                                    >
+                                                        <FileUp className="h-4 w-4" />
+                                                        Ver Análisis de Sangre (PDF)
+                                                    </a>
                                                 </div>
                                             )}
                                         </div>

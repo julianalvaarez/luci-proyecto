@@ -1,17 +1,40 @@
 "use client";
 
 import { useBooking } from '@/context/BookingContext';
-import { Check, CalendarCheck, ShieldCheck } from 'lucide-react';
-import { useState } from 'react';
+import { Check, CalendarCheck, ShieldCheck, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { supabase } from '@/lib/supabase';
 
 export default function PaymentSummary() {
     const { state } = useBooking();
     const [loading, setLoading] = useState(false);
+    const [serviceDetails, setServiceDetails] = useState<any>(null);
 
-    // In a real app, we would fetch service details from the DB
-    const serviceName = state.serviceId === '1' ? 'Consulta Online' : 'Consulta Presencial';
-    const price = state.serviceId === '1' ? 45000 : 55000;
+    // Fetch the real service data from Supabase instead of hardcoded defaults
+    useEffect(() => {
+        async function fetchService() {
+            if (!state.serviceId) return;
+            const { data } = await supabase
+                .from('services')
+                .select('name, price')
+                .eq('id', state.serviceId)
+                .single();
+            if (data) setServiceDetails(data);
+        }
+        fetchService();
+    }, [state.serviceId]);
+
+    if (!serviceDetails && state.serviceId) {
+        return (
+            <div className="flex justify-center p-20">
+                <Loader2 className="h-8 w-8 animate-spin text-brand-primary" />
+            </div>
+        );
+    }
+
+    const serviceName = serviceDetails?.name || 'Consulta';
+    const price = serviceDetails?.price || 0;
 
     const handleConfirm = async () => {
         setLoading(true);

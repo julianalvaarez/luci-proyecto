@@ -17,9 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Lic. Luciana Cresia - Nutricionista",
   description: "Agenda tu turno online de forma simple y rápida. Modalidad online o presencial.",
-  icons: {
-    icon: '/logo-luci.png',
-  },
+  manifest: '/manifest.json',
   openGraph: {
     title: "Lic. Luciana Cresia - Nutricionista",
     description: "Agenda tu turno online de forma simple y rápida. Modalidad online o presencial.",
@@ -38,9 +36,15 @@ export const metadata: Metadata = {
     description: "Agenda tu turno online de forma simple y rápida. Modalidad online o presencial.",
     images: ['/food-image.png'],
   },
-  other: {
-    "theme-color": "#00e362",
+  icons: {
+    apple: "/logo-luci.png"
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Lic. Luciana Cresia - Nutricionista"
+  },
+  themeColor: "#00e362",
 };
 
 export default function RootLayout({
