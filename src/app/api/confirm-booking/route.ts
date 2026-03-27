@@ -1,137 +1,72 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { Resend } from 'resend';
-import { render } from '@react-email/render';
-import { ConfirmationEmail } from '@/components/emails/ConfirmationEmail';
-import { AdminNotificationEmail } from '@/components/emails/AdminNotificationEmail';
-import React from 'react';
+import { MercadoPagoConfig, Preference } from 'mercadopago';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const client = new MercadoPagoConfig({
+    accessToken: process.env.MP_ACCESS_TOKEN || '',
+});
 
 export async function POST(req: NextRequest) {
     try {
         const { bookingData } = await req.json();
 
-        // 1. Calculate end time
-        const start = new Date(bookingData.slotId); // e.g., "2026-03-12T15:00:00"
-        const end = new Date(start.getTime() + 60 * 60 * 1000); // 1 hour duration
-
-        // 2. Create Slot
-        const { data: slot, error: slotError } = await supabase
-            .from('slots')
-            .insert({
-                start_time: start.toISOString(),
-                end_time: end.toISOString(),
-                status: 'reserved'
-            })
-            .select()
+        // 1. Fetch Service Price
+        const { data: service, error: sError } = await supabase
+            .from('services')
+            .select('*')
+            .eq('id', bookingData.serviceId)
             .single();
 
-        if (slotError) {
-            console.error('Error creating slot:', slotError);
-            return NextResponse.json({ error: 'Failed to reserve slot' }, { status: 400 });
+        if (sError || !service) {
+            throw new Error('Service not found');
         }
 
-        // 3. Create Patient (or find existing)
-        const { data: patient, error: pError } = await supabase
-            .from('patients')
-            .upsert({
-                email: bookingData.contactData.email,
-                first_name: bookingData.contactData.firstName,
-                last_name: bookingData.contactData.lastName,
-                phone: bookingData.contactData.phone,
-                age: bookingData.contactData.age
-            }, { onConflict: 'email' })
+        // 2. Clear out any previous pending bookings for this same slot to avoid double payment issues
+        // (Optional check)
+
+        // 3. Store the pending booking in DB
+        const { data: pending, error: pError } = await supabase
+            .from('pending_bookings')
+            .insert({
+                booking_data: bookingData,
+                status: 'pending'
+            })
             .select()
             .single();
 
         if (pError) throw pError;
 
-        // 4. Create Appointment (Confirmed directly since there's no payment)
-        const { data: appointment, error: aError } = await supabase
-            .from('appointments')
-            .insert({
-                patient_id: patient.id,
-                slot_id: slot.id,
-                service_id: bookingData.serviceId,
-                location_id: bookingData.locationId || null,
-                status: 'paid', // We mark it as paid/confirmed so it shows in the calendar
-                first_time: bookingData.isFirstTime,
-            })
-            .select()
-            .single();
+        // 4. Create Mercado Pago Preference
+        const preference = new Preference(client);
+        const result = await preference.create({
+            body: {
+                items: [
+                    {
+                        id: service.id,
+                        title: service.name,
+                        unit_price: service.price,
+                        quantity: 1,
+                        currency_id: 'ARS',
+                    },
+                ],
+                external_reference: pending.id, // Store our internal booking ID
+                back_urls: {
+                    success: `${process.env.NEXT_PUBLIC_BASE_URL}/booking/success`,
+                    failure: `${process.env.NEXT_PUBLIC_BASE_URL}/booking/failure`,
+                    pending: `${process.env.NEXT_PUBLIC_BASE_URL}/booking/pending`,
+                },
+                auto_return: 'approved',
+                notification_url: `${process.env.MP_WEBHOOK_URL}/api/webhook/mercadopago`,
+            },
+        });
 
-        if (aError) {
-            // Also rollback slot
-            await supabase.from('slots').delete().eq('id', slot.id);
-            throw aError;
-        }
-
-        // 5. Create Intake Form if exists
-        if (bookingData.isFirstTime && bookingData.intakeData) {
-            await supabase.from('intake_forms').insert({
-                appointment_id: appointment.id,
-                ...bookingData.intakeData,
-                age: bookingData.contactData?.age // Ensure age is saved even if removed from intake form UI
-            });
-        }
-
-        // 6. Send Emails
-        try {
-            const serviceName = bookingData.serviceId === '1' ? 'Consulta Online' : 'Consulta Presencial';
-            const dateStr = start.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
-            const timeStr = start.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-
-            // Render to HTML strings to avoid Resend automatic render issues
-            const confirmationHtml = await render(
-               React.createElement(ConfirmationEmail, {
-                    patientName: bookingData.contactData.firstName,
-                    serviceName: serviceName,
-                    date: dateStr,
-                    time: timeStr,
-                    modality: bookingData.modality,
-                    location: bookingData.modality === 'presencial' ? 'Consultorio Palermo' : undefined
-                })
-            );
-
-            const adminNotifyHtml = await render(
-                React.createElement(AdminNotificationEmail, {
-                    patientName: `${bookingData.contactData.firstName} ${bookingData.contactData.lastName}`,
-                    patientEmail: bookingData.contactData.email,
-                    patientPhone: bookingData.contactData.phone,
-                    serviceName: serviceName,
-                    date: dateStr,
-                    time: timeStr,
-                    modality: bookingData.modality,
-                    intakeData: bookingData.isFirstTime ? bookingData.intakeData : undefined
-                })
-            );
-
-            // Send to Patient
-            const patientEmailRes = await resend.emails.send({
-                from: 'NutriBooking <onboarding@resend.dev>',
-                to: bookingData.contactData.email,
-                subject: 'Confirmación de tu turno - Lic. Luciana Cresia',
-                html: confirmationHtml
-            });
-            console.log('Resend Patient Email Response:', patientEmailRes);
-
-            // Send to Admin
-            const adminEmailRes = await resend.emails.send({
-                from: 'NutriBooking <onboarding@resend.dev>',
-                to: 'julialva2008@gmail.com',
-                subject: `Nuevo Turno: ${bookingData.contactData.firstName} ${bookingData.contactData.lastName}`,
-                html: adminNotifyHtml
-            });
-            console.log('Resend Admin Email Response:', adminEmailRes);
-        } catch (emailError) {
-            console.error('Error sending emails block:', emailError);
-            // Don't fail the whole booking if email fails
-        }
-
-        return NextResponse.json({ success: true, redirect: '/booking/success' });
+        return NextResponse.json({ 
+            success: true, 
+            init_point: result.init_point, // For direct redirect or opening modal
+            preference_id: result.id 
+        });
     } catch (error: any) {
-        console.error('Booking Error:', error);
+        console.error('Preference Error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

@@ -11,24 +11,32 @@ export default function SuccessPage() {
                     </div>
                 </div>
 
-                <div className="space-y-2">
-                    <h1 className="text-4xl font-display font-bold">¡Turno Reservado!</h1>
-                    <p className="text-gray-500">Tu turno está agendado con éxito. El pago se realizará el día de la consulta.</p>
+                <div className="space-y-4">
+                    <h1 className="text-4xl font-display font-bold text-gray-900 leading-tight">¡Turno Confirmado!</h1>
+                    <p className="text-gray-500 font-medium">Hemos recibido tu pago y tu turno está agendado con éxito. 🎉</p>
                 </div>
 
-                <div className="bg-emerald-50 p-6 rounded-3xl space-y-4 text-left">
-                    <div className="flex items-start gap-3">
-                        <Calendar className="h-5 w-5 text-brand-primary mt-1" />
+                <div className="bg-emerald-50/50 backdrop-blur-sm p-8 rounded-[40px] space-y-6 text-left border border-emerald-100/50 shadow-sm">
+                    <div className="flex items-start gap-4">
+                        <div className="h-10 w-10 bg-emerald-100 rounded-2xl flex items-center justify-center shrink-0">
+                            <Calendar className="h-5 w-5 text-brand-primary" />
+                        </div>
                         <div>
-                            <p className="font-bold">Detalles del turno</p>
-                            <p className="text-sm text-emerald-800">Recibirás un email con el link a la sesión online o las instrucciones de llegada a la sucursal.</p>
+                            <p className="font-bold text-gray-800">Próximos pasos</p>
+                            <p className="text-sm text-emerald-800 mt-1 leading-relaxed">
+                                En unos minutos recibirás un email con los detalles de la consulta y el link de acceso si es online.
+                            </p>
                         </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                        <MessageSquare className="h-5 w-5 text-brand-primary mt-1" />
+                    <div className="flex items-start gap-4">
+                        <div className="h-10 w-10 bg-emerald-100 rounded-2xl flex items-center justify-center shrink-0">
+                            <MessageSquare className="h-5 w-5 text-brand-primary" />
+                        </div>
                         <div>
-                            <p className="font-bold">¿Tienes dudas?</p>
-                            <p className="text-sm text-emerald-800">Puedes contactarnos por WhatsApp al +54 11 1234 5678</p>
+                            <p className="font-bold text-gray-800">¿Tienes dudas?</p>
+                            <p className="text-sm text-emerald-800 mt-1 leading-relaxed">
+                                Puedes contactarnos por WhatsApp al <span className="font-bold">+54 9 11 6536-8186</span>
+                            </p>
                         </div>
                     </div>
                 </div>

@@ -49,67 +49,91 @@ export default function PaymentSummary() {
 
             const result = await response.json();
             
-            if (response.ok && result.success) {
-                window.location.href = result.redirect;
+            if (response.ok && result.init_point) {
+                // Redirect to Mercado Pago checkout
+                window.location.href = result.init_point;
             } else {
-                throw new Error(result.error || 'Error confirming booking');
+                throw new Error(result.error || 'Error creating payment preference');
             }
         } catch (error) {
             console.error('Error confirming booking:', error);
-            toast.error('Hubo un error al confirmar el turno. Intenta nuevamente.');
+            toast.error('Hubo un error al procesar el pago. Intenta nuevamente.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center">
                 <h2 className="text-3xl font-display font-bold">Resumen de tu turno</h2>
-                <p className="text-gray-500 mt-2">Revisa los detalles antes de confirmar.</p>
+                <p className="text-gray-500 mt-2">Para confirmar tu reserva, debes abonar el total de la consulta.</p>
             </div>
 
-            <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm space-y-6">
-                <div className="space-y-4">
-                    <div className="flex justify-between items-center pb-4 border-b border-gray-50">
-                        <span className="text-gray-500">Servicio</span>
-                        <span className="font-bold">{serviceName}</span>
+            <div className="bg-white rounded-[40px] p-8 md:p-10 border border-gray-100 shadow-xl shadow-gray-200/50 space-y-8 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
+                    <ShieldCheck className="h-32 w-32 text-brand-primary" />
+                </div>
+
+                <div className="space-y-5 relative z-10">
+                    <div className="flex justify-between items-center pb-5 border-b border-gray-50">
+                        <span className="text-gray-500 font-medium font-sans italic">Servicio</span>
+                        <span className="font-bold text-gray-800">{serviceName}</span>
                     </div>
-                    <div className="flex justify-between items-center pb-4 border-b border-gray-50">
-                        <span className="text-gray-500">Modalidad</span>
-                        <span className="font-bold uppercase text-xs px-2 py-1 bg-emerald-50 text-emerald-700 rounded-md">
-                            {state.modality}
+                    <div className="flex justify-between items-center pb-5 border-b border-gray-50">
+                        <span className="text-gray-500 font-medium font-sans italic">Modalidad</span>
+                        <span className="font-bold uppercase text-[10px] tracking-wider px-3 py-1.5 bg-brand-primary/10 text-brand-primary rounded-full">
+                            {state.modality === 'online' ? '🌎 Online' : '📍 Presencial'}
                         </span>
                     </div>
-                    <div className="flex justify-between items-center pb-4 border-b border-gray-50">
-                        <span className="text-gray-500">Fecha y Hora</span>
-                        <span className="font-bold">{state.slotId?.replace('T', ' ')}</span>
+                    <div className="flex justify-between items-center pb-5 border-b border-gray-50">
+                        <span className="text-gray-500 font-medium font-sans italic">Fecha y Hora</span>
+                        <span className="font-bold text-gray-800">
+                            {state.slotId && new Date(state.slotId).toLocaleDateString('es-AR', {
+                                weekday: 'long',
+                                day: 'numeric',
+                                month: 'long',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}
+                        </span>
                     </div>
                     <div className="flex justify-between items-center">
-                        <span className="text-gray-500">Paciente</span>
-                        <span className="font-bold">{state.contactData?.firstName} {state.contactData?.lastName}</span>
+                        <span className="text-gray-500 font-medium font-sans italic">Paciente</span>
+                        <span className="font-bold text-gray-800">
+                            {state.contactData?.firstName} {state.contactData?.lastName}
+                        </span>
                     </div>
                 </div>
 
-                <div className="pt-6 border-t border-gray-100">
-                    <div className="flex justify-between items-center mb-6">
-                        <span className="text-xl font-bold">Total a pagar (en consulta)</span>
-                        <span className="text-3xl font-display font-bold text-brand-primary">
-                            ${price.toLocaleString()}
-                        </span>
+                <div className="pt-8 border-t-2 border-dashed border-gray-100 relative z-10">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 text-center md:text-left">
+                        <div>
+                            <span className="text-gray-400 font-bold uppercase text-[10px] tracking-[0.2em]">Total a pagar ahora</span>
+                            <div className="flex items-center gap-2 mt-1">
+                                <span className="text-4xl font-display font-black text-brand-primary">
+                                    ${price.toLocaleString()}
+                                </span>
+                                <span className="text-gray-400 font-medium">ARS</span>
+                            </div>
+                        </div>
+                        <div className="bg-blue-50 px-4 py-2 rounded-2xl flex items-center gap-2 border border-blue-100">
+                            <img src="https://www.mercadopago.com/instore/merchant/static/images/logo_mp.png" alt="Mercado Pago" className="h-4" />
+                            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">Pago Seguro</span>
+                        </div>
                     </div>
 
                     <button
                         onClick={handleConfirm}
                         disabled={loading}
-                        className="w-full h-14 bg-brand-primary text-white rounded-full font-bold hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-xl shadow-emerald-100"
+                        className="w-full h-16 bg-brand-primary text-white rounded-full font-black text-lg hover:bg-brand-secondary transition-all flex items-center justify-center gap-3 shadow-2xl shadow-emerald-200 disabled:opacity-50 disabled:cursor-not-allowed group active:scale-[0.98]"
                     >
                         {loading ? (
-                            <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <Loader2 className="h-6 w-6 animate-spin" />
                         ) : (
                             <>
-                                Confirmar Turno
-                                <CalendarCheck className="h-5 w-5" />
+                                Pagar y Confirmar Turno
+                                <Check className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
                             </>
                         )}
                     </button>
