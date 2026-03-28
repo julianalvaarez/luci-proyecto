@@ -37,6 +37,9 @@ export async function POST(req: NextRequest) {
         if (pError) throw pError;
 
         // 4. Create Mercado Pago Preference
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
+                      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+
         const preference = new Preference(client);
         const result = await preference.create({
             body: {
@@ -51,12 +54,12 @@ export async function POST(req: NextRequest) {
                 ],
                 external_reference: pending.id, // Store our internal booking ID
                 back_urls: {
-                    success: `${process.env.NEXT_PUBLIC_BASE_URL}/booking/success`,
-                    failure: `${process.env.NEXT_PUBLIC_BASE_URL}/booking/failure`,
-                    pending: `${process.env.NEXT_PUBLIC_BASE_URL}/booking/pending`,
+                    success: `${baseUrl}/booking/success`,
+                    failure: `${baseUrl}/booking/failure`,
+                    pending: `${baseUrl}/booking/pending`,
                 },
                 auto_return: 'approved',
-                notification_url: `${process.env.MP_WEBHOOK_URL}/api/webhook/mercadopago`,
+                notification_url: `${process.env.MP_WEBHOOK_URL || baseUrl}/api/webhook/mercadopago`,
             },
         });
 

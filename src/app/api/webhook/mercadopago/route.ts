@@ -115,41 +115,41 @@ export async function POST(req: NextRequest) {
 
                     const confirmationHtml = await render(
                         React.createElement(ConfirmationEmail, {
-                             patientName: bookingData.contactData.firstName,
-                             serviceName: serviceName,
-                             date: dateStr,
-                             time: timeStr,
-                             modality: bookingData.modality,
-                             location: bookingData.modality === 'presencial' ? 'Consultorio Palermo' : undefined
-                         })
-                     );
-         
-                     const adminNotifyHtml = await render(
-                         React.createElement(AdminNotificationEmail, {
-                             patientName: `${bookingData.contactData.firstName} ${bookingData.contactData.lastName}`,
-                             patientEmail: bookingData.contactData.email,
-                             patientPhone: bookingData.contactData.phone,
-                             serviceName: serviceName,
-                             date: dateStr,
-                             time: timeStr,
-                             modality: bookingData.modality,
-                             intakeData: bookingData.isFirstTime ? bookingData.intakeData : undefined
-                         })
-                     );
-         
-                     await resend.emails.send({
-                         from: 'NutriBooking <onboarding@resend.dev>',
-                         to: bookingData.contactData.email,
-                         subject: 'Confirmación de tu pago y turno - Lic. Luciana Cresia',
-                         html: confirmationHtml
-                     });
-         
-                     await resend.emails.send({
-                         from: 'NutriBooking <onboarding@resend.dev>',
-                         to: 'julialva2008@gmail.com',
-                         subject: `NUEVO TURNO PAGADO: ${bookingData.contactData.firstName} ${bookingData.contactData.lastName}`,
-                         html: adminNotifyHtml
-                     });
+                            patientName: bookingData.contactData.firstName,
+                            serviceName: serviceName,
+                            date: dateStr,
+                            time: timeStr,
+                            modality: bookingData.modality,
+                            location: bookingData.modality === 'presencial' ? 'Las Flores 542' : undefined
+                        })
+                    );
+
+                    const adminNotifyHtml = await render(
+                        React.createElement(AdminNotificationEmail, {
+                            patientName: `${bookingData.contactData.firstName} ${bookingData.contactData.lastName}`,
+                            patientEmail: bookingData.contactData.email,
+                            patientPhone: bookingData.contactData.phone,
+                            serviceName: serviceName,
+                            date: dateStr,
+                            time: timeStr,
+                            modality: bookingData.modality,
+                            intakeData: bookingData.isFirstTime ? bookingData.intakeData : undefined
+                        })
+                    );
+
+                    await resend.emails.send({
+                        from: 'NutriBooking <onboarding@resend.dev>',
+                        to: bookingData.contactData.email,
+                        subject: 'Confirmación de tu pago y turno - Lic. Luciana Cresia',
+                        html: confirmationHtml
+                    });
+
+                    await resend.emails.send({
+                        from: 'NutriBooking <onboarding@resend.dev>',
+                        to: 'julialva2008@gmail.com',
+                        subject: `NUEVO TURNO PAGADO: ${bookingData.contactData.firstName} ${bookingData.contactData.lastName}`,
+                        html: adminNotifyHtml
+                    });
 
                 } catch (error) {
                     console.error('Email error in webhook:', error);
@@ -161,6 +161,6 @@ export async function POST(req: NextRequest) {
     } catch (error: any) {
         console.error('Webhook Error:', error);
         // Important: return a 200 or MP will keep retrying and erroring out
-        return NextResponse.json({ error: error.message }, { status: 200 }); 
+        return NextResponse.json({ error: error.message }, { status: 200 });
     }
 }
