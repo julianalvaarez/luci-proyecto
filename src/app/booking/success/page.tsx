@@ -22,9 +22,9 @@ export default function SuccessPage() {
                             <Calendar className="h-5 w-5 text-brand-primary" />
                         </div>
                         <div>
-                            <p className="font-bold text-gray-800">Próximos pasos</p>
+                            <p className="font-bold text-gray-800">Tu reserva está lista</p>
                             <p className="text-sm text-emerald-800 mt-1 leading-relaxed">
-                                En unos minutos recibirás un email con los detalles de la consulta y el link de acceso si es online.
+                                Ya puedes agendar el link de acceso si es online, o presentarte en la sucursal el día indicado.
                             </p>
                         </div>
                     </div>

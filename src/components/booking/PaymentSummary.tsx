@@ -67,7 +67,7 @@ export default function PaymentSummary() {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center">
                 <h2 className="text-3xl font-display font-bold">Resumen de tu turno</h2>
-                <p className="text-gray-500 mt-2">Para confirmar tu reserva, debes abonar el total de la consulta.</p>
+                <p className="text-gray-500 mt-2">Para confirmar tu reserva, debes abonar el total a través de <span className="text-blue-600 font-bold">Mercado Pago</span>.</p>
             </div>
 
             <div className="bg-white rounded-[40px] p-8 md:p-10 border border-gray-100 shadow-xl shadow-gray-200/50 space-y-8 relative overflow-hidden">
@@ -117,31 +117,35 @@ export default function PaymentSummary() {
                                 <span className="text-gray-400 font-medium">ARS</span>
                             </div>
                         </div>
-                        <div className="bg-blue-50 px-4 py-2 rounded-2xl flex items-center gap-2 border border-blue-100">
-                            <img src="https://www.mercadopago.com/instore/merchant/static/images/logo_mp.png" alt="Mercado Pago" className="h-4" />
-                            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">Pago Seguro</span>
+                        <div className="bg-blue-50 px-5 py-3 rounded-2xl flex items-center gap-3 border-2 border-blue-100 shadow-sm">
+                            <img src="https://www.mercadopago.com/instore/merchant/static/images/logo_mp.png" alt="Mercado Pago" className="h-6" />
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-black text-blue-700 uppercase tracking-tighter leading-none">Pago Seguro</span>
+                                <span className="text-[10px] font-medium text-blue-400 leading-none mt-1">Mercado Pago</span>
+                            </div>
                         </div>
                     </div>
 
                     <button
                         onClick={handleConfirm}
                         disabled={loading}
-                        className="w-full h-16 bg-brand-primary text-white rounded-full font-black text-lg hover:bg-brand-secondary transition-all flex items-center justify-center gap-3 shadow-2xl shadow-emerald-200 disabled:opacity-50 disabled:cursor-not-allowed group active:scale-[0.98]"
+                        className="w-full h-18 py-5 bg-brand-primary text-white rounded-full font-black text-xl hover:bg-brand-secondary transition-all flex items-center justify-center gap-3 shadow-2xl shadow-emerald-200 disabled:opacity-50 disabled:cursor-not-allowed group active:scale-[0.98]"
                     >
                         {loading ? (
                             <Loader2 className="h-6 w-6 animate-spin" />
                         ) : (
                             <>
-                                Pagar y Confirmar Turno
+                                Pagar con Mercado Pago
                                 <Check className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
                             </>
                         )}
                     </button>
 
-                    <div className="flex items-center justify-center gap-2 mt-4 text-gray-400 text-xs text-center">
+                    <div className="flex items-center justify-center gap-2 mt-6 text-gray-400 text-xs text-center font-medium">
                         <ShieldCheck className="h-4 w-4" />
-                        Tus datos están protegidos y tu turno quedará reservado
+                        Tu pago es procesado de forma segura por Mercado Pago
                     </div>
+
                 </div>
             </div>
         </div>

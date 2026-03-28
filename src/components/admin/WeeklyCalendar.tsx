@@ -2,11 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Plus, MapPin, Video, Loader2, FileUp } from 'lucide-react';
+import { format as formatTZ, toZonedTime } from 'date-fns-tz';
 import { format, startOfWeek, addDays, isSameDay, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
+
+const ARG_TZ = 'America/Argentina/Buenos_Aires';
 
 interface WeeklyCalendarProps {
     onOpenManual: () => void;
@@ -23,7 +26,7 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
         const h = Math.floor(i / 2) + 8;
         const m = i % 2 === 0 ? '00' : '30';
         return `${h.toString().padStart(2, '0')}:${m}`;
-    }); // 08:00 to 20:00 in 30min steps
+    });
 
     const [selectedAppt, setSelectedAppt] = useState<any | null>(null);
     const [selectedDay, setSelectedDay] = useState(new Date());
@@ -44,8 +47,16 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
 
     const getAppointmentsForHour = (day: Date, hour: string) => {
         return appointments.filter(a => {
-            const apptDate = a.slots?.start_time ? parseISO(a.slots.start_time) : null;
-            return apptDate && isSameDay(apptDate, day) && format(apptDate, 'HH:mm') === hour;
+            if (!a.slots?.start_time) return false;
+            // Parse and convert to Argentina TZ
+            const utcDate = parseISO(a.slots.start_time);
+            const apptZoned = toZonedTime(utcDate, ARG_TZ);
+            const dayZoned = toZonedTime(day, ARG_TZ);
+            
+            const matchesDay = isSameDay(apptZoned, dayZoned);
+            const matchesHour = formatTZ(apptZoned, 'HH:mm', { timeZone: ARG_TZ }) === hour;
+            
+            return matchesDay && matchesHour;
         });
     };
 
@@ -81,8 +92,10 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
                 {days.map((day) => {
                     const isSelected = isSameDay(day, selectedDay);
                     const hasAppts = appointments.some(a => {
-                       const d = a.slots?.start_time ? parseISO(a.slots.start_time) : null;
-                       return d && isSameDay(d, day);
+                       if (!a.slots?.start_time) return false;
+                       const apptZoned = toZonedTime(parseISO(a.slots.start_time), ARG_TZ);
+                       const dayZoned = toZonedTime(day, ARG_TZ);
+                       return isSameDay(apptZoned, dayZoned);
                     });
                     return (
                         <button
@@ -97,6 +110,7 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
                     );
                 })}
             </div>
+
 
             {/* Content Area */}
             <div className="flex-1 overflow-hidden flex flex-col">
@@ -251,7 +265,7 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
                                 <div className="flex justify-between items-center bg-gray-50 p-3 rounded-xl">
                                     <span className="text-gray-500 font-medium">Horario</span>
                                     <span className="font-bold text-brand-primary">
-                                        {format(parseISO(selectedAppt.slots?.start_time), 'EEEE d MMMM, HH:mm', { locale: es })}
+                                        {formatTZ(toZonedTime(parseISO(selectedAppt.slots?.start_time), ARG_TZ), "EEEE d 'de' MMMM, HH:mm", { locale: es, timeZone: ARG_TZ })}
                                     </span>
                                 </div>
                                 {selectedAppt.services?.modality === 'presencial' && selectedAppt.locations && (
