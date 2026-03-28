@@ -2,7 +2,7 @@
     "name": "Lic. Luciana Cresia",
     "short_name": "Nutricion",
     "description": "Lic. Luciana Cresia Nutricionista Clínica",
-    "start_url": "/",
+    "start_url": "/admin",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#000000",

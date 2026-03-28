@@ -3,7 +3,6 @@ import { supabase } from '@/lib/supabase';
 import { Payment, MercadoPagoConfig } from 'mercadopago';
 import { Resend } from 'resend';
 import { render } from '@react-email/render';
-import { ConfirmationEmail } from '@/components/emails/ConfirmationEmail';
 import { AdminNotificationEmail } from '@/components/emails/AdminNotificationEmail';
 import React from 'react';
 
@@ -122,17 +121,7 @@ export async function POST(req: NextRequest) {
                     const dateStr = start.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
                     const timeStr = start.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
 
-                    const confirmationHtml = await render(
-                        React.createElement(ConfirmationEmail, {
-                            patientName: bookingData.contactData.firstName,
-                            serviceName: serviceName,
-                            date: dateStr,
-                            time: timeStr,
-                            modality: bookingData.modality,
-                            location: bookingData.modality === 'presencial' ? 'Las Flores 542' : undefined
-                        })
-                    );
-
+                    console.log('Generating Admin Notification Email HTML...');
                     const adminNotifyHtml = await render(
                         React.createElement(AdminNotificationEmail, {
                             patientName: `${bookingData.contactData.firstName} ${bookingData.contactData.lastName}`,
@@ -146,25 +135,21 @@ export async function POST(req: NextRequest) {
                         })
                     );
 
-                    const patientEmailRes = await resend.emails.send({
-                        from: 'onboarding@resend.dev',
-                        to: bookingData.contactData.email,
-                        subject: 'Confirmación de tu pago y turno - Lic. Luciana Cresia',
-                        html: confirmationHtml
-                    });
-                    console.log('Patient email response:', patientEmailRes);
-
-                    const adminEmailRes = await resend.emails.send({
+                    console.log('Sending email to admin: lucianacresiaalvarez@gmail.com');
+                    const { data: adminEmailData, error: adminEmailError } = await resend.emails.send({
                         from: 'onboarding@resend.dev',
                         to: 'lucianacresiaalvarez@gmail.com',
                         subject: `NUEVO TURNO PAGADO: ${bookingData.contactData.firstName} ${bookingData.contactData.lastName}`,
                         html: adminNotifyHtml
                     });
-                    console.log('Admin email response:', adminEmailRes);
 
-                    console.log('Email sending process finished');
-                } catch (error) {
-                    console.error('Email error in webhook:', error);
+                    if (adminEmailError) {
+                        console.error('Error from Resend:', adminEmailError);
+                    } else {
+                        console.log('Admin notification email sent successfully:', adminEmailData);
+                    }
+                } catch (emailError) {
+                    console.error('Error in email sending process:', emailError);
                 }
             }
         }
