@@ -37,10 +37,24 @@ export async function POST(req: NextRequest) {
         if (pError) throw pError;
 
         // 4. Create Mercado Pago Preference
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
-                      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+        // Robust base URL detection
+        let baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+        if (!baseUrl && process.env.VERCEL_URL) {
+            baseUrl = `https://${process.env.VERCEL_URL}`;
+        }
+        // Hard fallback to your specific domain to ensure it works in production
+        if (!baseUrl) {
+            baseUrl = 'https://lucianacresia.vercel.app';
+        }
 
         const preference = new Preference(client);
+        
+        // Ensure notification_url is a valid absolute URL or omit it
+        let notification_url = process.env.MP_WEBHOOK_URL;
+        if (!notification_url || !notification_url.startsWith('http')) {
+            notification_url = `${baseUrl}/api/webhook/mercadopago`;
+        }
+
         const result = await preference.create({
             body: {
                 items: [
@@ -52,14 +66,14 @@ export async function POST(req: NextRequest) {
                         currency_id: 'ARS',
                     },
                 ],
-                external_reference: pending.id, // Store our internal booking ID
+                external_reference: pending.id,
                 back_urls: {
                     success: `${baseUrl}/booking/success`,
                     failure: `${baseUrl}/booking/failure`,
                     pending: `${baseUrl}/booking/pending`,
                 },
                 auto_return: 'approved',
-                notification_url: `${process.env.MP_WEBHOOK_URL || baseUrl}/api/webhook/mercadopago`,
+                notification_url: notification_url,
             },
         });
 
