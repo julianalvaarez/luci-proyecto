@@ -16,15 +16,19 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { type, data } = body;
+        console.log('Webhook received:', body);
+        
+        const type = body.type || body.topic;
+        const paymentId = body.data?.id || body.id;
 
-        // Check only for payment-related notifications
-        if (type === 'payment' && data?.id) {
+        if (type === 'payment' && paymentId) {
+            console.log('Processing payment:', paymentId);
             const payment = new Payment(client);
-            const paymentDetails = await payment.get({ id: data.id });
+            const paymentDetails = await payment.get({ id: paymentId });
 
             if (paymentDetails.status === 'approved') {
-                const bookingId = paymentDetails.external_reference; // This matches the ID of 'pending_bookings' table
+                const bookingId = paymentDetails.external_reference;
+                console.log('Payment approved for bookingId:', bookingId);
 
                 // 1. Fetch pending booking data
                 const { data: pending, error: pendingError } = await supabase
@@ -43,10 +47,6 @@ export async function POST(req: NextRequest) {
                 const start = new Date(bookingData.slotId);
                 const end = new Date(start.getTime() + 60 * 60 * 1000);
 
-                // Check if slot is still available or already reserved?
-                // For simplified flow, we assume the slot was 'released' if it fails, 
-                // but usually, we should check status here again.
-
                 // A. Create Slot
                 const { data: slot, error: slotError } = await supabase
                     .from('slots')
@@ -58,7 +58,10 @@ export async function POST(req: NextRequest) {
                     .select()
                     .single();
 
-                if (slotError) throw slotError;
+                if (slotError) {
+                    console.error('Slot Error:', slotError);
+                    throw slotError;
+                }
 
                 // B. Create/Upsert Patient
                 const { data: patient, error: patientError } = await supabase
@@ -73,7 +76,10 @@ export async function POST(req: NextRequest) {
                     .select()
                     .single();
 
-                if (patientError) throw patientError;
+                if (patientError) {
+                    console.error('Patient Error:', patientError);
+                    throw patientError;
+                }
 
                 // C. Create Appointment
                 const { data: appointment, error: appointmentError } = await supabase
@@ -83,13 +89,16 @@ export async function POST(req: NextRequest) {
                         slot_id: slot.id,
                         service_id: bookingData.serviceId,
                         location_id: bookingData.locationId || null,
-                        status: 'paid', // Now confirmed after payment
+                        status: 'paid',
                         first_time: bookingData.isFirstTime,
                     })
                     .select()
                     .single();
 
-                if (appointmentError) throw appointmentError;
+                if (appointmentError) {
+                    console.error('Appointment Error:', appointmentError);
+                    throw appointmentError;
+                }
 
                 // D. Create Intake Form if First Time
                 if (bookingData.isFirstTime && bookingData.intakeData) {
@@ -120,7 +129,7 @@ export async function POST(req: NextRequest) {
                             date: dateStr,
                             time: timeStr,
                             modality: bookingData.modality,
-                            location: bookingData.modality === 'presencial' ? 'Las Flores 542' : undefined
+                            location: bookingData.modality === 'presencial' ? 'Consultorio Palermo' : undefined
                         })
                     );
 
@@ -146,11 +155,12 @@ export async function POST(req: NextRequest) {
 
                     await resend.emails.send({
                         from: 'NutriBooking <onboarding@resend.dev>',
-                        to: 'julialva2008@gmail.com',
+                        to: 'lucianacresiaalvarez@gmail.com',
                         subject: `NUEVO TURNO PAGADO: ${bookingData.contactData.firstName} ${bookingData.contactData.lastName}`,
                         html: adminNotifyHtml
                     });
 
+                    console.log('Emails sent successfully');
                 } catch (error) {
                     console.error('Email error in webhook:', error);
                 }
@@ -159,8 +169,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ ok: true });
     } catch (error: any) {
-        console.error('Webhook Error:', error);
-        // Important: return a 200 or MP will keep retrying and erroring out
+        console.error('Webhook Error (Critical):', error);
         return NextResponse.json({ error: error.message }, { status: 200 });
     }
 }

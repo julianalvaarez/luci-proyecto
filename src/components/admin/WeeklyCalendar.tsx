@@ -22,6 +22,7 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
     const hours = Array.from({ length: 13 }, (_, i) => `${(i + 8).toString().padStart(2, '0')}:00`); // 08:00 to 20:00
 
     const [selectedAppt, setSelectedAppt] = useState<any | null>(null);
+    const [selectedDay, setSelectedDay] = useState(new Date());
 
     useEffect(() => {
         async function fetchAppointments() {
@@ -37,92 +38,184 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
         fetchAppointments();
     }, [currentWeek]);
 
+    const getAppointmentsForHour = (day: Date, hour: string) => {
+        return appointments.filter(a => {
+            const apptDate = a.slots?.start_time ? parseISO(a.slots.start_time) : null;
+            return apptDate && isSameDay(apptDate, day) && format(apptDate, 'HH:mm') === hour;
+        });
+    };
+
     return (
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden text-left relative">
+        <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden text-left relative flex flex-col h-full min-h-[600px]">
             {/* Header */}
-            <div className="p-4 md:p-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h2 className="text-xl md:text-2xl font-bold capitalize">{format(currentWeek, 'MMMM yyyy', { locale: es })}</h2>
-                    <p className="text-gray-400 text-sm">Calendario de turnos semanal</p>
+            <div className="p-6 md:p-8 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-gradient-to-r from-white to-gray-50">
+                <div className="space-y-1">
+                    <h2 className="text-3xl font-black text-gray-900 capitalize tracking-tight">{format(currentWeek, 'MMMM yyyy', { locale: es })}</h2>
+                    <p className="text-gray-400 font-medium text-sm">Gestiona la agenda y seguimiento de pacientes.</p>
                 </div>
-                <div className="flex items-center gap-2 justify-between md:justify-end w-full md:w-auto">
-                    <div className="flex gap-1">
-                        <button onClick={() => setCurrentWeek(addDays(currentWeek, -7))} className="p-2 hover:bg-gray-50 rounded-full transition-colors">
+                <div className="flex items-center gap-3 justify-between sm:justify-end w-full sm:w-auto">
+                    <div className="flex bg-gray-100 p-1.5 rounded-2xl">
+                        <button onClick={() => setCurrentWeek(addDays(currentWeek, -7))} className="p-2.5 hover:bg-white hover:shadow-sm rounded-xl transition-all active:scale-95 text-gray-600">
                             <ChevronLeft className="h-5 w-5" />
                         </button>
-                        <button onClick={() => setCurrentWeek(addDays(currentWeek, 7))} className="p-2 hover:bg-gray-50 rounded-full transition-colors">
+                        <button onClick={() => setCurrentWeek(addDays(currentWeek, 7))} className="p-2.5 hover:bg-white hover:shadow-sm rounded-xl transition-all active:scale-95 text-gray-600">
                             <ChevronRight className="h-5 w-5" />
                         </button>
                     </div>
                     <button
                         onClick={onOpenManual}
-                        className="bg-brand-primary text-white px-4 py-2 rounded-full font-medium flex items-center gap-2 hover:bg-brand-secondary transition-all shadow-lg shadow-emerald-100"
+                        className="bg-brand-primary text-white px-6 py-3.5 rounded-2xl font-black flex items-center gap-2 hover:bg-brand-secondary transition-all shadow-xl shadow-emerald-100 active:scale-95 text-sm"
                     >
-                        <Plus className="h-4 w-4" />
-                        <span className="hidden sm:inline">Nuevo Turno</span>
-                        <span className="sm:hidden">Nuevo</span>
+                        <Plus className="h-5 w-5" />
+                        <span>Nuevo Turno</span>
                     </button>
                 </div>
             </div>
 
-            {/* Grid Container */}
-            <div className="overflow-x-auto">
-                <div className="min-w-[800px]">
+            {/* Mobile Day Selector */}
+            <div className="md:hidden flex overflow-x-auto p-4 gap-3 bg-white scrollbar-hide border-b border-gray-50">
+                {days.map((day) => {
+                    const isSelected = isSameDay(day, selectedDay);
+                    const hasAppts = appointments.some(a => {
+                       const d = a.slots?.start_time ? parseISO(a.slots.start_time) : null;
+                       return d && isSameDay(d, day);
+                    });
+                    return (
+                        <button
+                            key={day.toISOString()}
+                            onClick={() => setSelectedDay(day)}
+                            className={`flex flex-col items-center justify-center min-w-[64px] h-20 rounded-2xl transition-all relative ${isSelected ? 'bg-brand-primary text-white shadow-lg shadow-emerald-100' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'}`}
+                        >
+                            <span className="text-[10px] font-black uppercase tracking-widest">{format(day, 'EEE', { locale: es })}</span>
+                            <span className="text-xl font-black mt-1">{format(day, 'd')}</span>
+                            {hasAppts && !isSelected && <div className="absolute bottom-2 h-1.5 w-1.5 bg-brand-primary rounded-full" />}
+                        </button>
+                    );
+                })}
+            </div>
 
-                    {/* Grid */}
-                    <div className="grid grid-cols-7 border-b border-gray-50 bg-gray-50/50">
-                        <div className="p-4 border-r border-gray-100"></div> {/* Time column spacer */}
-                        {days.map((day) => (
-                            <div key={day.toISOString()} className="p-4 border-r border-gray-100 text-center">
-                                <span className="text-xs uppercase font-bold text-gray-400">{format(day, 'EEE', { locale: es })}</span>
-                                <div className="text-xl font-bold">{format(day, 'd')}</div>
+            {/* Content Area */}
+            <div className="flex-1 overflow-hidden flex flex-col">
+                {/* Mobile Daily List View */}
+                <div className="md:hidden flex-1 overflow-y-auto p-6 space-y-4">
+                    {loading ? (
+                        <div className="py-20 text-center flex flex-col items-center gap-4">
+                            <div className="relative">
+                                <Loader2 className="animate-spin h-10 w-10 text-brand-primary" />
+                                <div className="absolute inset-0 h-10 w-10 bg-emerald-500/20 rounded-full blur-xl scale-150 animate-pulse" />
                             </div>
-                        ))}
-                    </div>
-
-                    <div className="relative">
-                        {loading ? (
-                            <div className="p-20 text-center flex flex-col items-center gap-2">
-                                <Loader2 className="animate-spin text-brand-primary" />
-                                <p className="text-sm text-gray-400">Cargando agenda...</p>
-                            </div>
-                        ) : (
-                            hours.map((hour) => (
-                                <div key={hour} className="grid grid-cols-7 border-b border-gray-50 min-h-[50px]">
-                                    <div className="p-4 border-r border-gray-100 text-sm font-medium text-gray-400 text-right">
-                                        {hour}
-                                    </div>
-                                    {days.map((day) => {
-                                        const dayAppointments = appointments.filter(a => {
-                                            const apptDate = a.slots?.start_time ? parseISO(a.slots.start_time) : null;
-                                            return apptDate && isSameDay(apptDate, day) && format(apptDate, 'HH:mm') === hour;
-                                        });
-
-                                        return (
-                                            <div key={day.toISOString() + hour} className="p-2 border-r border-gray-100 relative group min-h-[80px]">
-                                                {dayAppointments.map(appt => (
-                                                    <div
-                                                        key={appt.id}
-                                                        onClick={() => setSelectedAppt(appt)}
-                                                        className={`p-3 rounded-xl text-[10px] shadow-sm cursor-pointer mb-1 transition-all hover:scale-[1.02] hover:shadow-md border-l-4 ${appt.services?.modality === 'online' ? 'bg-emerald-50 text-emerald-800 border-emerald-500' : 'bg-blue-50 text-blue-800 border-blue-500'
-                                                            }`}
-                                                    >
-                                                        <div className="font-bold truncate text-[11px] mb-0.5">{appt.patients?.first_name} {appt.patients?.last_name}</div>
-                                                        <div className="flex items-center gap-1 opacity-70 truncate line-clamp-1 leading-tight">
-                                                            {appt.services?.modality === 'online' ? <Video className="h-2 w-2 flex-shrink-0" /> : <MapPin className="h-2 w-2 flex-shrink-0" />}
-                                                            {appt.services?.name}
+                            <p className="text-gray-400 font-bold text-sm tracking-wide">Actualizando agenda...</p>
+                        </div>
+                    ) : (
+                        <>
+                            {hours.map(hour => {
+                                const hourAppts = getAppointmentsForHour(selectedDay, hour);
+                                if (hourAppts.length === 0) return null;
+                                return (
+                                    <div key={hour} className="flex gap-4">
+                                        <div className="w-12 pt-1">
+                                            <span className="text-xs font-black text-gray-300">{hour}</span>
+                                        </div>
+                                        <div className="flex-1 space-y-2 min-h-[40px] border-l-2 border-gray-50 pl-4 py-1">
+                                            {hourAppts.map(appt => (
+                                                <div
+                                                    key={appt.id}
+                                                    onClick={() => setSelectedAppt(appt)}
+                                                    className={`p-4 rounded-3xl shadow-sm border border-gray-100 transition-all active:scale-98 bg-white ${appt.services?.modality === 'online' ? 'border-l-4 border-emerald-500' : 'border-l-4 border-blue-500'}`}
+                                                >
+                                                    <div className="flex justify-between items-start">
+                                                        <div className="font-black text-gray-900 text-sm">{appt.patients?.first_name} {appt.patients?.last_name}</div>
+                                                        <div className={`text-[9px] font-black px-2 py-1 rounded-lg uppercase tracking-wider ${appt.status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                                                            {appt.status === 'paid' ? 'PAGO' : 'PENDIENTE'}
                                                         </div>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        );
-                                    })}
+                                                    <div className="flex items-center gap-2 mt-2">
+                                                        <div className="p-1 px-2 bg-gray-50 rounded-lg flex items-center gap-1 max-w-full overflow-hidden">
+                                                            {appt.services?.modality === 'online' ? <Video className="h-3 w-3 text-emerald-500" /> : <MapPin className="h-3 w-3 text-blue-500" />}
+                                                            <span className="text-[10px] font-bold text-gray-500 truncate">{appt.services?.name}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            {hours.every(h => getAppointmentsForHour(selectedDay, h).length === 0) && (
+                                <div className="text-center py-20 bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-100">
+                                    <p className="text-gray-400 font-bold italic">No hay turnos para este día</p>
                                 </div>
-                            ))
-                        )}
+                            )}
+                        </>
+                    )}
+                </div>
+
+                {/* Desktop Grid View */}
+                <div className="hidden md:block flex-1 overflow-x-auto">
+                    <div className="min-w-[1000px] h-full flex flex-col">
+                        {/* Desktop Header Grid */}
+                        <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50/30 sticky top-0 z-10 backdrop-blur-md">
+                            <div className="p-6 border-r border-gray-50 text-right">
+                                <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Hora</span>
+                            </div>
+                            {days.map((day) => (
+                                <div key={day.toISOString()} className={`p-6 border-r border-gray-50 text-center transition-colors ${isSameDay(day, new Date()) ? 'bg-white' : ''}`}>
+                                    <span className={`text-[10px] uppercase font-black tracking-widest ${isSameDay(day, new Date()) ? 'text-brand-primary' : 'text-gray-400'}`}>
+                                        {format(day, 'EEE', { locale: es })}
+                                    </span>
+                                    <div className={`text-2xl font-black mt-1 ${isSameDay(day, new Date()) ? 'text-brand-primary opacity-100 scale-110' : 'text-gray-900 opacity-60'}`}>
+                                        {format(day, 'd')}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Desktop Grid Body */}
+                        <div className="flex-1 overflow-y-auto">
+                            {loading ? (
+                                <div className="h-full flex flex-col items-center justify-center gap-4 bg-white/50 backdrop-blur-sm">
+                                    <Loader2 className="animate-spin h-10 w-10 text-brand-primary" />
+                                    <p className="text-sm font-bold text-gray-400">Actualizando calendario...</p>
+                                </div>
+                            ) : (
+                                hours.map((hour) => (
+                                    <div key={hour} className="grid grid-cols-7 border-b border-gray-50/50 min-h-[140px] group">
+                                        <div className="p-6 border-r border-gray-50 text-[11px] font-black text-gray-300 text-right bg-white group-hover:bg-gray-50 transition-colors">
+                                            {hour}
+                                        </div>
+                                        {days.map((day) => {
+                                            const dayAppts = getAppointmentsForHour(day, hour);
+                                            return (
+                                                <div key={day.toISOString() + hour} className="p-3 border-r border-gray-50/50 relative bg-white group-hover:bg-gray-50/50 transition-colors min-h-full">
+                                                    {dayAppts.map(appt => (
+                                                        <div
+                                                            key={appt.id}
+                                                            onClick={() => setSelectedAppt(appt)}
+                                                            className={`p-4 rounded-2xl text-[11px] border border-gray-100 shadow-sm cursor-pointer mb-2 transition-all hover:scale-[1.02] hover:shadow-xl hover:z-10 group/appt relative overflow-hidden bg-white ${appt.services?.modality === 'online' ? 'border-l-4 border-emerald-500' : 'border-l-4 border-blue-500'}`}
+                                                        >
+                                                            <div className="font-black text-gray-900 mb-2 truncate group-hover/appt:whitespace-normal">{appt.patients?.first_name} {appt.patients?.last_name}</div>
+                                                            <div className="flex flex-col gap-2">
+                                                                <div className="inline-flex items-center gap-2 p-1 px-2 bg-gray-50 rounded-lg w-fit">
+                                                                    {appt.services?.modality === 'online' ? <Video className="h-3 w-3 text-emerald-500" /> : <MapPin className="h-3 w-3 text-blue-500" />}
+                                                                    <span className="font-bold text-gray-500 truncate max-w-[100px]">{appt.services?.name}</span>
+                                                                </div>
+                                                                <div className={`text-[8px] font-black px-2 py-1 rounded-md w-fit tracking-tighter ${appt.status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                                                                    {appt.status === 'paid' ? 'CONFIRMADO' : 'PENDIENTE'}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
+
 
             {/* Appointment Details Modal */}
             {selectedAppt && (

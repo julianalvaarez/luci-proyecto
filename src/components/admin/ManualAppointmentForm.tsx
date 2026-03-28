@@ -183,80 +183,89 @@ export default function ManualAppointmentForm({ onClose, onSuccess, initialData 
   if (loading) return <div className="p-10 text-center"><Loader2 className="animate-spin inline-block" /></div>;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4 text-left">
-      <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 max-h-[90vh] flex flex-col">
-        <div className="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-          <h3 className="text-xl font-bold">{isEdit ? 'Editar Turno' : 'Crear Turno Manual'}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-white rounded-full transition-all">
-            <X className="h-5 w-5" />
+    <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-xl flex items-end sm:items-center justify-center z-[150] p-0 sm:p-4 text-left">
+      <div className="bg-white w-full max-w-2xl rounded-t-[3rem] sm:rounded-[3rem] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-10 sm:zoom-in duration-300 max-h-[92vh] flex flex-col">
+        <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
+          <div>
+            <h3 className="text-2xl font-black text-gray-900">{isEdit ? 'Editar Turno' : 'Nuevo Turno'}</h3>
+            <p className="text-gray-400 text-sm font-medium">Completa los datos del paciente y horario.</p>
+          </div>
+          <button onClick={onClose} className="p-3 bg-white hover:bg-gray-100 rounded-2xl transition-all shadow-sm">
+            <X className="h-6 w-6 text-gray-400" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8 space-y-4 md:space-y-6 overflow-y-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-sm font-bold text-gray-400 uppercase">Nombre</label>
-              <input {...register('firstName', { required: true })} className="w-full h-11 px-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-brand-primary" placeholder="Ej: Juan" />
+        <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-8 overflow-y-auto scrollbar-hide">
+          <div className="space-y-4">
+            <h4 className="text-[10px] font-black uppercase text-brand-primary tracking-widest px-1">Información Personal</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-400 px-1">Nombre</label>
+                <input {...register('firstName', { required: true })} className="w-full h-14 px-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary focus:bg-white transition-all font-bold text-gray-700 outline-none" placeholder="Ej: Juan" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-400 px-1">Apellido</label>
+                <input {...register('lastName', { required: true })} className="w-full h-14 px-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary focus:bg-white transition-all font-bold text-gray-700 outline-none" placeholder="Ej: Perez" />
+              </div>
             </div>
-            <div className="space-y-1">
-              <label className="text-sm font-bold text-gray-400 uppercase">Apellido</label>
-              <input {...register('lastName', { required: true })} className="w-full h-11 px-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-brand-primary" placeholder="Ej: Perez" />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-400 px-1">Email</label>
+                <input {...register('email', { required: true })} className="w-full h-14 px-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary focus:bg-white transition-all font-bold text-gray-700 outline-none" placeholder="juan@email.com" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-400 px-1">Teléfono</label>
+                <input {...register('phone')} className="w-full h-14 px-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary focus:bg-white transition-all font-bold text-gray-700 outline-none" placeholder="+54 9 11..." />
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-sm font-bold text-gray-400 uppercase">Email</label>
-              <input {...register('email', { required: true })} className="w-full h-11 px-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-brand-primary" placeholder="juan@email.com" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-bold text-gray-400 uppercase">Teléfono</label>
-              <input {...register('phone')} className="w-full h-11 px-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-brand-primary" placeholder="+54..." />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-50">
-            <div className="space-y-1">
-              <label className="text-sm font-bold text-gray-400 uppercase">Servicio</label>
-              <select {...register('service_id', { required: true })} className="w-full h-11 px-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-brand-primary">
-                <option value="">Seleccionar...</option>
-                {services.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-              </select>
-            </div>
-            {selectedService?.modality === 'presencial' && (
-              <div className="space-y-1">
-                <label className="text-sm font-bold text-gray-400 uppercase">Sucursal</label>
-                <select {...register('location_id', { required: true })} className="w-full h-11 px-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-brand-primary">
+          <div className="space-y-4 pt-4 border-t border-gray-50">
+            <h4 className="text-[10px] font-black uppercase text-brand-primary tracking-widest px-1">Detalles del Servicio</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-400 px-1">Servicio</label>
+                <select {...register('service_id', { required: true })} className="w-full h-14 px-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary focus:bg-white transition-all font-bold text-gray-700 outline-none appearance-none">
                   <option value="">Seleccionar...</option>
-                  {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                  {services.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               </div>
-            )}
+              {selectedService?.modality === 'presencial' && (
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-400 px-1">Sucursal</label>
+                  <select {...register('location_id', { required: true })} className="w-full h-14 px-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary focus:bg-white transition-all font-bold text-gray-700 outline-none appearance-none">
+                    <option value="">Seleccionar...</option>
+                    {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                  </select>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-sm font-bold text-gray-400 uppercase">Fecha</label>
-              <input type="date" {...register('date', { required: true })} className="w-full h-11 px-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-brand-primary" />
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 px-1">Fecha</label>
+              <input type="date" {...register('date', { required: true })} className="w-full h-14 px-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary focus:bg-white transition-all font-bold text-gray-700 outline-none" />
             </div>
-            <div className="space-y-1">
-              <label className="text-sm font-bold text-gray-400 uppercase">Hora</label>
-              <input type="time" {...register('time', { required: true })} className="w-full h-11 px-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-brand-primary" />
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-400 px-1">Hora</label>
+              <input type="time" {...register('time', { required: true })} className="w-full h-14 px-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary focus:bg-white transition-all font-bold text-gray-700 outline-none" />
             </div>
           </div>
 
-          <div className="space-y-1">
-            <label className="text-sm font-bold text-gray-400 uppercase">Notas (Opcional)</label>
-            <textarea {...register('notes')} className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-brand-primary" rows={2} placeholder="Algún detalle relevante del paciente..." />
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-gray-400 px-1">Notas (Opcional)</label>
+            <textarea {...register('notes')} className="w-full p-5 bg-gray-50 rounded-[2rem] border-2 border-transparent focus:border-brand-primary focus:bg-white transition-all font-medium text-gray-700 outline-none" rows={3} placeholder="Detalles relevantes..." />
           </div>
 
-          <div className="flex gap-3 pt-4">
-            <button type="button" onClick={onClose} className="flex-1 h-12 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-all">
+          <div className="flex flex-col sm:flex-row gap-3 pt-6 pb-4">
+            <button type="button" onClick={onClose} className="flex-1 h-15 py-4 bg-gray-50 text-gray-500 rounded-2xl font-black hover:bg-gray-100 transition-all sm:order-1">
               Cancelar
             </button>
-            <button type="submit" disabled={submitting} className="flex-[2] h-12 bg-brand-primary text-white rounded-xl font-bold hover:bg-brand-secondary transition-all shadow-lg shadow-emerald-100 flex items-center justify-center gap-2">
-              {submitting ? <Loader2 className="animate-spin h-5 w-5" /> : <Save className="h-5 w-5" />}
-              {isEdit ? 'Guardar Cambios' : 'Crear Turno'}
+            <button type="submit" disabled={submitting} className="flex-[2] h-15 py-4 bg-brand-primary text-white rounded-2xl font-black hover:bg-brand-secondary transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-3 sm:order-2 active:scale-95 disabled:opacity-50">
+              {submitting ? <Loader2 className="animate-spin h-6 w-6" /> : <Save className="h-6 w-6" />}
+              <span>{isEdit ? 'Guardar Cambios' : 'Confirmar Turno'}</span>
             </button>
           </div>
         </form>
@@ -264,3 +273,4 @@ export default function ManualAppointmentForm({ onClose, onSuccess, initialData 
     </div>
   );
 }
+
