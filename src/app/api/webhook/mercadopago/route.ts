@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         console.log('Webhook received:', body);
-        
+
         const type = body.type || body.topic;
         const paymentId = body.data?.id || body.id;
 
@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
                             date: dateStr,
                             time: timeStr,
                             modality: bookingData.modality,
-                            location: bookingData.modality === 'presencial' ? 'Consultorio Palermo' : undefined
+                            location: bookingData.modality === 'presencial' ? 'Las Flores 542' : undefined
                         })
                     );
 
@@ -146,21 +146,23 @@ export async function POST(req: NextRequest) {
                         })
                     );
 
-                    await resend.emails.send({
-                        from: 'NutriBooking <onboarding@resend.dev>',
+                    const patientEmailRes = await resend.emails.send({
+                        from: 'onboarding@resend.dev',
                         to: bookingData.contactData.email,
                         subject: 'Confirmación de tu pago y turno - Lic. Luciana Cresia',
                         html: confirmationHtml
                     });
+                    console.log('Patient email response:', patientEmailRes);
 
-                    await resend.emails.send({
-                        from: 'NutriBooking <onboarding@resend.dev>',
+                    const adminEmailRes = await resend.emails.send({
+                        from: 'onboarding@resend.dev',
                         to: 'lucianacresiaalvarez@gmail.com',
                         subject: `NUEVO TURNO PAGADO: ${bookingData.contactData.firstName} ${bookingData.contactData.lastName}`,
                         html: adminNotifyHtml
                     });
+                    console.log('Admin email response:', adminEmailRes);
 
-                    console.log('Emails sent successfully');
+                    console.log('Email sending process finished');
                 } catch (error) {
                     console.error('Email error in webhook:', error);
                 }

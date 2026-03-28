@@ -19,7 +19,11 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
     const [loading, setLoading] = useState(true);
 
     const days = Array.from({ length: 6 }, (_, i) => addDays(currentWeek, i)); // Mon - Sat
-    const hours = Array.from({ length: 13 }, (_, i) => `${(i + 8).toString().padStart(2, '0')}:00`); // 08:00 to 20:00
+    const hours = Array.from({ length: 25 }, (_, i) => {
+        const h = Math.floor(i / 2) + 8;
+        const m = i % 2 === 0 ? '00' : '30';
+        return `${h.toString().padStart(2, '0')}:${m}`;
+    }); // 08:00 to 20:00 in 30min steps
 
     const [selectedAppt, setSelectedAppt] = useState<any | null>(null);
     const [selectedDay, setSelectedDay] = useState(new Date());
@@ -179,8 +183,8 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
                                 </div>
                             ) : (
                                 hours.map((hour) => (
-                                    <div key={hour} className="grid grid-cols-7 border-b border-gray-50/50 min-h-[140px] group">
-                                        <div className="p-6 border-r border-gray-50 text-[11px] font-black text-gray-300 text-right bg-white group-hover:bg-gray-50 transition-colors">
+                                    <div key={hour} className="grid grid-cols-7 border-b border-gray-50/50 min-h-[100px] group">
+                                        <div className="p-4 border-r border-gray-50 text-[10px] font-black text-gray-300 text-right bg-white group-hover:bg-gray-50 transition-colors">
                                             {hour}
                                         </div>
                                         {days.map((day) => {
