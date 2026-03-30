@@ -30,7 +30,7 @@ export default function AvailabilityEditor() {
   const [editingRule, setEditingRule] = useState<Partial<Rule> | null>(null);
   const [ruleToDelete, setRuleToDelete] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  
+
   const [exceptions, setExceptions] = useState<Exception[]>([]);
   const [newExceptionDate, setNewExceptionDate] = useState('');
 
@@ -40,7 +40,7 @@ export default function AvailabilityEditor() {
         supabase.from('availability_rules').select('*'),
         supabase.from('locations').select('*')
       ]);
-      
+
       if (rulesData) setRules(rulesData);
       if (locationsData) setLocations(locationsData);
 
@@ -49,11 +49,11 @@ export default function AvailabilityEditor() {
         .select('*')
         .eq('is_blocked', true)
         .order('date');
-      
+
       if (!expError && expData) {
         setExceptions(expData);
       }
-      
+
       setLoading(false);
     }
     fetchData();
@@ -77,7 +77,7 @@ export default function AvailabilityEditor() {
   const handleSaveRule = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingRule) return;
-    
+
     setSubmitting(true);
     try {
       const { data, error } = await supabase
@@ -87,7 +87,7 @@ export default function AvailabilityEditor() {
         .single();
 
       if (error) throw error;
-      
+
       if (editingRule.id) {
         setRules(rules.map(r => r.id === data.id ? data : r));
         toast.success('Horario actualizado');
@@ -113,7 +113,7 @@ export default function AvailabilityEditor() {
         .eq('id', ruleToDelete);
 
       if (error) throw error;
-      
+
       setRules(rules.filter(r => r.id !== ruleToDelete));
       toast.success('Horario eliminado');
       setIsDeleteModalOpen(false);
@@ -134,7 +134,7 @@ export default function AvailabilityEditor() {
         .insert([{ date: newExceptionDate, is_blocked: true }])
         .select()
         .single();
-      
+
       if (error) throw error;
       setExceptions([...exceptions, data]);
       setNewExceptionDate('');
@@ -147,13 +147,13 @@ export default function AvailabilityEditor() {
   };
 
   const handleDeleteException = async (id: string) => {
-    if(!confirm('¿Seguro quieres desbloquear este día?')) return;
+    if (!confirm('¿Seguro quieres desbloquear este día?')) return;
     try {
       const { error } = await supabase
         .from('availability_exceptions')
         .delete()
         .eq('id', id);
-        
+
       if (error) throw error;
       setExceptions(exceptions.filter(e => e.id !== id));
       toast.success('Día desbloqueado');
@@ -171,7 +171,7 @@ export default function AvailabilityEditor() {
           <h2 className="text-3xl font-black text-gray-900 tracking-tight">Gestión de Horarios</h2>
           <p className="text-gray-500 font-medium mt-1 text-sm md:text-base">Configura tus franjas de disponibilidad semanal.</p>
         </div>
-        <button 
+        <button
           onClick={openAddModal}
           className="w-full sm:w-auto bg-brand-primary text-white px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-brand-secondary transition-all shadow-xl shadow-emerald-100 group active:scale-95"
         >
@@ -202,16 +202,16 @@ export default function AvailabilityEditor() {
                 {dayRules.map((rule) => {
                   const location = locations.find(l => l.id === rule.location_id);
                   return (
-                    <div 
-                      key={rule.id} 
+                    <div
+                      key={rule.id}
                       className="bg-white p-4 sm:p-5 rounded-[2rem] border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 shadow-sm hover:shadow-xl hover:border-emerald-100 transition-all group relative overflow-hidden"
                     >
                       <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                      
+
                       <div className={`h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110 ${!rule.location_id ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
                         {!rule.location_id ? <Globe className="h-7 w-7" /> : <MapPin className="h-7 w-7" />}
                       </div>
-                      
+
                       <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-y-4 sm:gap-4 items-center w-full">
                         <div>
                           <p className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-wider">Horario</p>
@@ -222,7 +222,7 @@ export default function AvailabilityEditor() {
                             </p>
                           </div>
                         </div>
-                        
+
                         <div className="col-span-1 lg:col-span-2">
                           <p className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-wider">Modalidad / Sucursal</p>
                           <div className="flex items-center gap-2">
@@ -235,7 +235,7 @@ export default function AvailabilityEditor() {
                       </div>
 
                       <div className="flex items-center gap-2 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-50">
-                        <button 
+                        <button
                           onClick={() => openEditModal(rule)}
                           className="flex-1 sm:flex-none py-3 px-5 sm:p-3 text-emerald-600 bg-emerald-50 sm:bg-transparent sm:text-gray-400 hover:text-brand-primary hover:bg-emerald-50 rounded-2xl transition-all flex items-center justify-center gap-2"
                           title="Editar"
@@ -243,7 +243,7 @@ export default function AvailabilityEditor() {
                           <Clock className="h-5 w-5" />
                           <span className="sm:hidden font-bold">Editar</span>
                         </button>
-                        <button 
+                        <button
                           onClick={() => {
                             setRuleToDelete(rule.id);
                             setIsDeleteModalOpen(true);
@@ -270,8 +270,8 @@ export default function AvailabilityEditor() {
             </div>
             <h3 className="text-xl font-bold text-gray-900">Sin horarios definidos</h3>
             <p className="text-gray-400 mt-2 max-w-xs mx-auto">Comienza agregando tus franjas de atención para que los pacientes puedan reservar.</p>
-            <button 
-              onClick={openAddModal} 
+            <button
+              onClick={openAddModal}
               className="mt-8 text-brand-primary font-black flex items-center gap-2 mx-auto bg-white px-6 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95"
             >
               <Plus className="h-5 w-5" />
@@ -281,21 +281,7 @@ export default function AvailabilityEditor() {
         )}
       </div>
 
-      <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-8 rounded-[2.5rem] shadow-xl shadow-emerald-100 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden group/info">
-        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover/info:scale-110 transition-transform">
-          <Clock className="h-32 w-32 text-white" />
-        </div>
-        <div className="bg-white/20 backdrop-blur-md text-white p-4 rounded-3xl relative z-10">
-          <Globe className="h-8 w-8" />
-        </div>
-        <div className="relative z-10 text-center md:text-left">
-          <h4 className="font-black text-white text-xl">¿Cómo funciona?</h4>
-          <p className="text-emerald-50 text-base mt-1 max-w-xl">
-            Los pacientes verán turnos disponibles cada 60 minutos dentro de los rangos que definas. 
-            Cualquier modificación impacta en tiempo real sobre tu agenda pública.
-          </p>
-        </div>
-      </div>
+
 
       {/* Excepciones */}
       <div className="pt-10 mt-10 border-t border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -305,14 +291,14 @@ export default function AvailabilityEditor() {
             <p className="text-gray-500 font-medium mt-1 text-sm md:text-base">Maneja feriados o días en los que no tomarás turnos.</p>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
-            <input 
-              type="date" 
-              className="flex-1 sm:w-48 bg-gray-50 border-2 border-transparent focus:border-red-500 rounded-xl px-4 font-bold text-gray-700 outline-none" 
+            <input
+              type="date"
+              className="flex-1 border sm:w-48 bg-gray-50 border-2 focus:border-red-500 rounded-xl px-4 font-bold text-gray-700 outline-none"
               value={newExceptionDate}
               onChange={e => setNewExceptionDate(e.target.value)}
             />
-            <button 
-              onClick={handleAddException} 
+            <button
+              onClick={handleAddException}
               className="bg-red-50 text-red-600 px-6 py-3 rounded-xl font-bold hover:bg-red-100 flex items-center gap-2 transition-all active:scale-95 whitespace-nowrap"
               disabled={!newExceptionDate || submitting}
             >
@@ -321,7 +307,7 @@ export default function AvailabilityEditor() {
             </button>
           </div>
         </div>
-        
+
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {exceptions.map(exc => {
             // Se asume timezone local UTC para evitar q cambie el dia mostrado
@@ -369,7 +355,7 @@ export default function AvailabilityEditor() {
                 <X className="h-6 w-6 text-gray-400" />
               </button>
             </div>
-            
+
             <form onSubmit={handleSaveRule} className="p-8 pt-4 space-y-6">
               <div className="space-y-3">
                 <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest px-1">Día de la semana</label>
@@ -378,7 +364,7 @@ export default function AvailabilityEditor() {
                     <button
                       key={idx}
                       type="button"
-                      onClick={() => setEditingRule({...editingRule!, day_of_week: idx})}
+                      onClick={() => setEditingRule({ ...editingRule!, day_of_week: idx })}
                       className={`h-11 rounded-xl font-bold text-xs transition-all ${editingRule?.day_of_week === idx ? 'bg-brand-primary text-white shadow-lg shadow-emerald-100' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'}`}
                     >
                       {DAYS_NAMES[idx].substring(0, 2)}
@@ -391,22 +377,22 @@ export default function AvailabilityEditor() {
                 <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest px-1">Desde</label>
                   <div className="relative group">
-                    <input 
-                      type="time" 
-                      value={editingRule?.start_time?.substring(0, 5)} 
-                      onChange={(e) => setEditingRule({...editingRule!, start_time: e.target.value})}
-                      className="w-full h-14 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary focus:bg-white transition-all px-4 font-bold text-gray-700 outline-none" 
+                    <input
+                      type="time"
+                      value={editingRule?.start_time?.substring(0, 5)}
+                      onChange={(e) => setEditingRule({ ...editingRule!, start_time: e.target.value })}
+                      className="w-full h-14 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary focus:bg-white transition-all px-4 font-bold text-gray-700 outline-none"
                     />
                   </div>
                 </div>
                 <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest px-1">Hasta</label>
                   <div className="relative">
-                    <input 
-                      type="time" 
-                      value={editingRule?.end_time?.substring(0, 5)} 
-                      onChange={(e) => setEditingRule({...editingRule!, end_time: e.target.value})}
-                      className="w-full h-14 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary focus:bg-white transition-all px-4 font-bold text-gray-700 outline-none" 
+                    <input
+                      type="time"
+                      value={editingRule?.end_time?.substring(0, 5)}
+                      onChange={(e) => setEditingRule({ ...editingRule!, end_time: e.target.value })}
+                      className="w-full h-14 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-primary focus:bg-white transition-all px-4 font-bold text-gray-700 outline-none"
                     />
                   </div>
                 </div>
@@ -417,7 +403,7 @@ export default function AvailabilityEditor() {
                 <div className="grid grid-cols-1 gap-2">
                   <button
                     type="button"
-                    onClick={() => setEditingRule({...editingRule!, location_id: null})}
+                    onClick={() => setEditingRule({ ...editingRule!, location_id: null })}
                     className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-all ${!editingRule?.location_id ? 'border-brand-primary bg-emerald-50' : 'border-gray-50 bg-white hover:border-gray-100'}`}
                   >
                     <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${!editingRule?.location_id ? 'bg-brand-primary text-white' : 'bg-gray-50 text-gray-400'}`}>
@@ -428,12 +414,12 @@ export default function AvailabilityEditor() {
                       <p className="text-[10px] text-gray-500">Video llamada</p>
                     </div>
                   </button>
-                  
+
                   {locations.map(loc => (
                     <button
                       key={loc.id}
                       type="button"
-                      onClick={() => setEditingRule({...editingRule!, location_id: loc.id})}
+                      onClick={() => setEditingRule({ ...editingRule!, location_id: loc.id })}
                       className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-all ${editingRule?.location_id === loc.id ? 'border-blue-500 bg-blue-50' : 'border-gray-50 bg-white hover:border-gray-100'}`}
                     >
                       <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${editingRule?.location_id === loc.id ? 'bg-blue-500 text-white' : 'bg-gray-50 text-gray-400'}`}>
@@ -449,14 +435,14 @@ export default function AvailabilityEditor() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-6">
-                <button 
+                <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                   className="flex-1 h-14 bg-gray-50 text-gray-500 rounded-2xl font-black hover:bg-gray-100 transition-all sm:order-1"
                 >
                   Cerrar
                 </button>
-                <button 
+                <button
                   type="submit"
                   disabled={submitting}
                   className="flex-[2] h-14 bg-brand-primary text-white rounded-2xl font-black hover:bg-brand-secondary transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-3 sm:order-2 active:scale-95 disabled:opacity-50"
@@ -483,7 +469,7 @@ export default function AvailabilityEditor() {
               Los pacientes ya no verán turnos en este rango. Esta acción no se puede deshacer.
             </p>
             <div className="flex flex-col gap-3">
-              <button 
+              <button
                 onClick={confirmDelete}
                 disabled={submitting}
                 className="w-full h-15 py-4 bg-red-500 text-white rounded-2xl font-black hover:bg-red-600 transition-all shadow-xl shadow-red-100 flex items-center justify-center gap-3 active:scale-95"
@@ -491,7 +477,7 @@ export default function AvailabilityEditor() {
                 {submitting ? <Loader2 className="animate-spin h-5 w-5" /> : <Trash2 className="h-5 w-5" />}
                 <span>Sí, eliminar ahora</span>
               </button>
-              <button 
+              <button
                 onClick={() => setIsDeleteModalOpen(false)}
                 className="w-full h-15 py-4 bg-gray-50 text-gray-500 rounded-2xl font-black hover:bg-gray-100 transition-all"
               >
