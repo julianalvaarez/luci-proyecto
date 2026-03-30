@@ -16,6 +16,19 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // 0. Check for Exceptions (Blocked Days)
+    const { data: exceptions, error: excError } = await supabase
+      .from('availability_exceptions')
+      .select('*')
+      .eq('date', dateStr)
+      .eq('is_blocked', true);
+      
+    // Si la fecha seleccionada está bloqueada, devolvemos sin turnos.
+    // Ignoramos errores puramente para no romper si la tabla no fue creada aún.
+    if (!excError && exceptions && exceptions.length > 0) {
+      return NextResponse.json({ slots: [] });
+    }
+
     const selectedDate = fromZonedTime(dateStr, ARG_TZ);
     
     // 1. Fetch Availability Rules for this day and modality/location

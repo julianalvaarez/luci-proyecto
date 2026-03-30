@@ -15,6 +15,7 @@ export default function SlotSelector() {
   const [slots, setSlots] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [availableDaysOfWeek, setAvailableDaysOfWeek] = useState<number[]>([]);
+  const [blockedDates, setBlockedDates] = useState<string[]>([]);
   const [fetchingRules, setFetchingRules] = useState(true);
 
   // 1. Fetch the rules once when modality/location changes to filter the days picker
@@ -32,15 +33,32 @@ export default function SlotSelector() {
           query = query.eq('location_id', state.locationId);
         }
 
-        const { data, error } = await query;
+        const [rulesRes, exceptionsRes] = await Promise.all([
+          query,
+          supabase.from('availability_exceptions').select('date').eq('is_blocked', true)
+        ]);
+
+        const { data, error } = rulesRes;
         if (error) throw error;
         
         const days = Array.from(new Set(data?.map(r => r.day_of_week) || []));
         setAvailableDaysOfWeek(days);
 
+        let safeBlockedDates: string[] = [];
+        if (!exceptionsRes.error && exceptionsRes.data) {
+          safeBlockedDates = exceptionsRes.data.map(e => e.date);
+          setBlockedDates(safeBlockedDates);
+        }
+
         // Auto-select first available date if current selectedDate is not available
-        const firstAvailable = FULL_DAYS_RANGE.find(d => days.includes(d.getDay()));
-        if (firstAvailable && !days.includes(selectedDate.getDay())) {
+        const firstAvailable = FULL_DAYS_RANGE.find(d => {
+          const isAllowedDay = days.includes(d.getDay());
+          const dateStr = format(d, 'yyyy-MM-dd');
+          const isBlocked = safeBlockedDates.includes(dateStr);
+          return isAllowedDay && !isBlocked;
+        });
+
+        if (firstAvailable && (!days.includes(selectedDate.getDay()) || safeBlockedDates.includes(format(selectedDate, 'yyyy-MM-dd')))) {
             setSelectedDate(firstAvailable);
         }
       } catch (error) {
@@ -81,7 +99,12 @@ export default function SlotSelector() {
     setStep('contact');
   };
 
-  const filteredDays = FULL_DAYS_RANGE.filter(d => availableDaysOfWeek.includes(d.getDay()));
+  const filteredDays = FULL_DAYS_RANGE.filter(d => {
+    const isAllowedDay = availableDaysOfWeek.includes(d.getDay());
+    const dateStr = format(d, 'yyyy-MM-dd');
+    const isBlocked = blockedDates.includes(dateStr);
+    return isAllowedDay && !isBlocked;
+  });
 
   if (fetchingRules) {
     return (

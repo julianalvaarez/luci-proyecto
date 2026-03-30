@@ -1,9 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Clock, Plus, Trash2, Globe, MapPin, Loader2, Save, X } from 'lucide-react';
+import { Clock, Plus, Trash2, Globe, MapPin, Loader2, Save, X, CalendarX } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'react-toastify';
+
+interface Exception {
+  id: string;
+  date: string;
+  is_blocked: boolean;
+}
 
 interface Rule {
   id: string;
@@ -24,6 +30,9 @@ export default function AvailabilityEditor() {
   const [editingRule, setEditingRule] = useState<Partial<Rule> | null>(null);
   const [ruleToDelete, setRuleToDelete] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  
+  const [exceptions, setExceptions] = useState<Exception[]>([]);
+  const [newExceptionDate, setNewExceptionDate] = useState('');
 
   useEffect(() => {
     async function fetchData() {
@@ -34,6 +43,17 @@ export default function AvailabilityEditor() {
       
       if (rulesData) setRules(rulesData);
       if (locationsData) setLocations(locationsData);
+
+      const { data: expData, error: expError } = await supabase
+        .from('availability_exceptions')
+        .select('*')
+        .eq('is_blocked', true)
+        .order('date');
+      
+      if (!expError && expData) {
+        setExceptions(expData);
+      }
+      
       setLoading(false);
     }
     fetchData();
@@ -102,6 +122,43 @@ export default function AvailabilityEditor() {
     } finally {
       setSubmitting(false);
       setRuleToDelete(null);
+    }
+  };
+
+  const handleAddException = async () => {
+    if (!newExceptionDate) return;
+    setSubmitting(true);
+    try {
+      const { data, error } = await supabase
+        .from('availability_exceptions')
+        .insert([{ date: newExceptionDate, is_blocked: true }])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      setExceptions([...exceptions, data]);
+      setNewExceptionDate('');
+      toast.success('Día bloqueado correctamente');
+    } catch (error: any) {
+      toast.error('Error: Asegúrate de haber creado la tabla exceptions en la base de datos.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteException = async (id: string) => {
+    if(!confirm('¿Seguro quieres desbloquear este día?')) return;
+    try {
+      const { error } = await supabase
+        .from('availability_exceptions')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      setExceptions(exceptions.filter(e => e.id !== id));
+      toast.success('Día desbloqueado');
+    } catch (error: any) {
+      toast.error('Error: ' + error.message);
     }
   };
 
@@ -237,6 +294,65 @@ export default function AvailabilityEditor() {
             Los pacientes verán turnos disponibles cada 60 minutos dentro de los rangos que definas. 
             Cualquier modificación impacta en tiempo real sobre tu agenda pública.
           </p>
+        </div>
+      </div>
+
+      {/* Excepciones */}
+      <div className="pt-10 mt-10 border-t border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8">
+          <div>
+            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Días Bloqueados (Excepciones)</h2>
+            <p className="text-gray-500 font-medium mt-1 text-sm md:text-base">Maneja feriados o días en los que no tomarás turnos.</p>
+          </div>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <input 
+              type="date" 
+              className="flex-1 sm:w-48 bg-gray-50 border-2 border-transparent focus:border-red-500 rounded-xl px-4 font-bold text-gray-700 outline-none" 
+              value={newExceptionDate}
+              onChange={e => setNewExceptionDate(e.target.value)}
+            />
+            <button 
+              onClick={handleAddException} 
+              className="bg-red-50 text-red-600 px-6 py-3 rounded-xl font-bold hover:bg-red-100 flex items-center gap-2 transition-all active:scale-95 whitespace-nowrap"
+              disabled={!newExceptionDate || submitting}
+            >
+              <CalendarX className="h-5 w-5" />
+              Bloquear
+            </button>
+          </div>
+        </div>
+        
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {exceptions.map(exc => {
+            // Se asume timezone local UTC para evitar q cambie el dia mostrado
+            const localDateStr = new Date(exc.date + "T00:00:00").toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            return (
+              <div key={exc.id} className="bg-white border border-gray-100 p-4 rounded-3xl flex items-center justify-between shadow-sm hover:shadow-xl hover:border-red-100 transition-all group overflow-hidden relative">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-red-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                    <CalendarX className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <p className="font-black text-gray-800 capitalize leading-tight">{localDateStr}</p>
+                    <p className="text-[10px] uppercase font-black tracking-widest text-red-400 mt-1">Día bloqueado completo</p>
+                  </div>
+                </div>
+                <button title="Desbloquear" onClick={() => handleDeleteException(exc.id)} className="p-3 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all">
+                  <Trash2 className="h-5 w-5" />
+                </button>
+              </div>
+            );
+          })}
+          {exceptions.length === 0 && (
+            <div className="col-span-full text-center py-10 bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200">
+              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                <CalendarX className="h-8 w-8 text-gray-300" />
+              </div>
+              <p className="text-gray-900 font-bold text-lg">No hay días bloqueados</p>
+              <p className="text-gray-400 mt-1">Los turnos se rigen enteramente por tus franjas horarias normales.</p>
+            </div>
+          )}
         </div>
       </div>
 

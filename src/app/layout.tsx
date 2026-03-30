@@ -53,9 +53,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es" translate="no">
+      <head>
+        <meta name="google" content="notranslate" />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} notranslate antialiased`}
       >
         <ToastContainer position="top-center" autoClose={3000} />
         {children}
