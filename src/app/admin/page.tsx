@@ -111,13 +111,7 @@ export default function AdminDashboard() {
                     <Clock className="h-6 w-6 mb-1" />
                     <span className="text-[10px] font-bold">Horarios</span>
                 </button>
-                <Link
-                    href="/"
-                    className="flex flex-col items-center justify-center w-full py-2 text-gray-400 hover:text-red-500"
-                >
-                    <LogOut className="h-6 w-6 mb-1" />
-                    <span className="text-[10px] font-bold">Salir</span>
-                </Link>
+
             </nav>
 
         </div>
