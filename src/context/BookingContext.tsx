@@ -36,6 +36,7 @@ interface BookingState {
     phone: string;
     age: number;
   };
+  paymentReceiptUrl?: string;
 }
 
 interface BookingContextType {

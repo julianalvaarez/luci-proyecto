@@ -20,15 +20,11 @@ export default function LandingPage() {
         <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle,transparent_0%,white_120%)] sm:bg-[radial-gradient(circle,transparent_10%,white_90%)]" />
       </div>
 
-      <header className="px-4 lg:px-6 h-16 flex items-center glass sticky top-0 z-50 border-b border-white/20">
+      <header className="px-4 lg:px-6 h-12 flex items-center justify-center glass sticky top-0 z-50 border-b border-white/20">
         <Link className="flex items-center justify-center" href="/">
-          <span className="font-display font-bold text-2xl text-brand-primary">Lic. Luciana Cresia</span>
+          <span className="font-display font-semibold text-xl text-brand-primary">Lic. Luciana Cresia</span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:text-brand-primary transition-colors" href="/admin">
-            Admin
-          </Link>
-        </nav>
+
       </header>
 
       <main className="flex-1 relative z-10">

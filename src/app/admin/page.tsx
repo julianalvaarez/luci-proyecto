@@ -55,7 +55,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="text-right">
-                            <p className="text-sm font-bold">Lic. Maria Nutri</p>
+                            <p className="text-sm font-bold">Luciana Cresia</p>
                             <p className="text-xs text-brand-primary font-medium">Nutricionista</p>
                         </div>
                         <div className="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center text-brand-primary font-bold">

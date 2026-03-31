@@ -143,9 +143,6 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
                                                 >
                                                     <div className="flex justify-between items-start">
                                                         <div className="font-black text-gray-900 text-sm">{appt.patients?.first_name} {appt.patients?.last_name}</div>
-                                                        <div className={`text-[9px] font-black px-2 py-1 rounded-lg uppercase tracking-wider ${appt.status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                                                            {appt.status === 'paid' ? 'PAGO' : 'PENDIENTE'}
-                                                        </div>
                                                     </div>
                                                     <div className="flex items-center gap-2 mt-2">
                                                         <div className="p-1 px-2 bg-gray-50 rounded-lg flex items-center gap-1 max-w-full overflow-hidden">
@@ -217,9 +214,6 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
                                                                     {appt.services?.modality === 'online' ? <Video className="h-3 w-3 text-emerald-500" /> : <MapPin className="h-3 w-3 text-blue-500" />}
                                                                     <span className="font-bold text-gray-500 truncate max-w-[100px]">{appt.services?.name}</span>
                                                                 </div>
-                                                                <div className={`text-[8px] font-black px-2 py-1 rounded-md w-fit tracking-tighter ${appt.status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                                                                    {appt.status === 'paid' ? 'CONFIRMADO' : 'PENDIENTE'}
-                                                                </div>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -274,12 +268,20 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
                                         <span className="font-bold">{selectedAppt.locations.name}</span>
                                     </div>
                                 )}
-                                <div className="flex justify-between items-center bg-gray-50 p-3 rounded-xl">
-                                    <span className="text-gray-500 font-medium">Estado del Pago</span>
-                                    <span className={`font-bold uppercase text-xs px-2 py-1 rounded-md ${selectedAppt.status === 'paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
-                                        {selectedAppt.status === 'paid' ? 'Confirmado' : 'Pendiente'}
-                                    </span>
-                                </div>
+
+                                {selectedAppt.payment_receipt_url && (
+                                    <div className="pt-2">
+                                        <a 
+                                            href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/payment-receipts/${selectedAppt.payment_receipt_url}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center justify-center gap-2 w-full py-3 bg-white border-2 border-dashed border-emerald-200 text-emerald-600 rounded-2xl font-bold hover:bg-emerald-50 hover:border-emerald-300 transition-all text-sm shadow-sm"
+                                        >
+                                            <FileUp className="h-5 w-5" />
+                                            Ver Comprobante de Pago
+                                        </a>
+                                    </div>
+                                )}
 
                                 {selectedAppt.intake_forms && selectedAppt.intake_forms.length > 0 && (
                                     <div className="mt-4 p-5 border border-emerald-100 bg-emerald-50 rounded-3xl space-y-4">

@@ -12,8 +12,8 @@ export default function SuccessPage() {
                 </div>
 
                 <div className="space-y-4">
-                    <h1 className="text-4xl font-display font-bold text-gray-900 leading-tight">¡Turno Confirmado!</h1>
-                    <p className="text-gray-500 font-medium">Hemos recibido tu pago y tu turno está agendado con éxito. 🎉</p>
+                    <h1 className="text-4xl font-display font-bold text-gray-900 leading-tight">¡Comprobante Recibido!</h1>
+                    <p className="text-gray-500 font-medium">Hemos recibido tu comprobante de transferencia y tu turno está agendado con éxito. 🎉</p>
                 </div>
 
                 <div className="bg-emerald-50/50 backdrop-blur-sm p-8 rounded-[40px] space-y-6 text-left border border-emerald-100/50 shadow-sm">

@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { MercadoPagoConfig, Preference } from 'mercadopago';
+import { Resend } from 'resend';
+import { render } from '@react-email/render';
+import { AdminNotificationEmail } from '@/components/emails/AdminNotificationEmail';
+import React from 'react';
 
-const client = new MercadoPagoConfig({
-    accessToken: process.env.MP_ACCESS_TOKEN || '',
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
     try {
         const { bookingData } = await req.json();
 
-        // 1. Fetch Service Price
+        // 1. Fetch Service
         const { data: service, error: sError } = await supabase
             .from('services')
             .select('*')
@@ -21,69 +22,94 @@ export async function POST(req: NextRequest) {
             throw new Error('Service not found');
         }
 
-        // 2. Clear out any previous pending bookings for this same slot to avoid double payment issues
-        // (Optional check)
+        const start = new Date(bookingData.slotId);
+        const end = new Date(start.getTime() + 60 * 60 * 1000);
 
-        // 3. Store the pending booking in DB
-        const { data: pending, error: pError } = await supabase
-            .from('pending_bookings')
+        // A. Create Slot
+        const { data: slot, error: slotError } = await supabase
+            .from('slots')
             .insert({
-                booking_data: bookingData,
-                status: 'pending'
+                start_time: start.toISOString(),
+                end_time: end.toISOString(),
+                status: 'reserved'
             })
             .select()
             .single();
 
-        if (pError) throw pError;
+        if (slotError) throw slotError;
 
-        // 4. Create Mercado Pago Preference
-        // Robust base URL detection
-        let baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-        if (!baseUrl && process.env.VERCEL_URL) {
-            baseUrl = `https://${process.env.VERCEL_URL}`;
+        // B. Create/Upsert Patient
+        const { data: patient, error: patientError } = await supabase
+            .from('patients')
+            .upsert({
+                email: bookingData.contactData.email,
+                first_name: bookingData.contactData.firstName,
+                last_name: bookingData.contactData.lastName,
+                phone: bookingData.contactData.phone,
+                age: bookingData.contactData.age
+            }, { onConflict: 'email' })
+            .select()
+            .single();
+
+        if (patientError) throw patientError;
+
+        // C. Create Appointment (Status pending, since payment needs manual verification)
+        const { data: appointment, error: appointmentError } = await supabase
+            .from('appointments')
+            .insert({
+                patient_id: patient.id,
+                slot_id: slot.id,
+                service_id: bookingData.serviceId,
+                location_id: bookingData.locationId || null,
+                status: 'pending',
+                first_time: bookingData.isFirstTime,
+                payment_receipt_url: bookingData.paymentReceiptUrl || null
+            })
+            .select()
+            .single();
+
+        if (appointmentError) throw appointmentError;
+
+        // D. Create Intake Form if First Time
+        if (bookingData.isFirstTime && bookingData.intakeData) {
+            await supabase.from('intake_forms').insert({
+                appointment_id: appointment.id,
+                ...bookingData.intakeData,
+                age: bookingData.contactData?.age
+            });
         }
-        // Hard fallback to your specific domain to ensure it works in production
-        if (!baseUrl) {
-            baseUrl = 'https://lucianacresia.vercel.app';
+
+        // E. Send Emails
+        try {
+            const dateStr = start.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+            const timeStr = start.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+
+            const adminNotifyHtml = await render(
+                React.createElement(AdminNotificationEmail, {
+                    patientName: `${bookingData.contactData.firstName} ${bookingData.contactData.lastName}`,
+                    patientEmail: bookingData.contactData.email,
+                    patientPhone: bookingData.contactData.phone,
+                    serviceName: service.name,
+                    date: dateStr,
+                    time: timeStr,
+                    modality: bookingData.modality,
+                    intakeData: bookingData.isFirstTime ? bookingData.intakeData : undefined
+                })
+            );
+
+            resend.emails.send({
+                from: 'onboarding@resend.dev',
+                to: 'lucianacresiaalvarez@gmail.com',
+                subject: `NUEVO TURNO SOLICITADO: ${bookingData.contactData.firstName} ${bookingData.contactData.lastName}`,
+                html: adminNotifyHtml
+            });
+        } catch (emailError) {
+            console.error('Error in email sending process:', emailError);
         }
 
-        const preference = new Preference(client);
-        
-        // Ensure notification_url is a valid absolute URL or omit it
-        let notification_url = process.env.MP_WEBHOOK_URL;
-        if (!notification_url || !notification_url.startsWith('http')) {
-            notification_url = `${baseUrl}/api/webhook/mercadopago`;
-        }
-
-        const result = await preference.create({
-            body: {
-                items: [
-                    {
-                        id: service.id,
-                        title: service.name,
-                        unit_price: service.price,
-                        quantity: 1,
-                        currency_id: 'ARS',
-                    },
-                ],
-                external_reference: pending.id,
-                back_urls: {
-                    success: `${baseUrl}/booking/success`,
-                    failure: `${baseUrl}/booking/failure`,
-                    pending: `${baseUrl}/booking/pending`,
-                },
-                auto_return: 'approved',
-                notification_url: notification_url,
-            },
-        });
-
-        return NextResponse.json({ 
-            success: true, 
-            init_point: result.init_point, // For direct redirect or opening modal
-            preference_id: result.id 
-        });
+        return NextResponse.json({ success: true, redirect: '/booking/success' });
     } catch (error: any) {
-        console.error('Preference Error:', error);
+        console.error('Confirm Booking Error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
