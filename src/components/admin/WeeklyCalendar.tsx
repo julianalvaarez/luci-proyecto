@@ -17,7 +17,7 @@ interface WeeklyCalendarProps {
 }
 
 export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCalendarProps) {
-    const [currentWeek, setCurrentWeek] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
+    const [currentWeek, setCurrentWeek] = useState(startOfWeek(toZonedTime(new Date(), ARG_TZ), { weekStartsOn: 1 }));
     const [appointments, setAppointments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -29,7 +29,7 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
     });
 
     const [selectedAppt, setSelectedAppt] = useState<any | null>(null);
-    const [selectedDay, setSelectedDay] = useState(new Date());
+    const [selectedDay, setSelectedDay] = useState(toZonedTime(new Date(), ARG_TZ));
 
     useEffect(() => {
         async function fetchAppointments() {
@@ -65,7 +65,9 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
             {/* Header */}
             <div className="p-6 md:p-8 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-gradient-to-r from-white to-gray-50">
                 <div className="space-y-1">
-                    <h2 className="text-3xl font-black text-gray-900 capitalize tracking-tight">{format(currentWeek, 'MMMM yyyy', { locale: es })}</h2>
+                    <h2 className="text-3xl font-black text-gray-900 capitalize tracking-tight">
+                        {formatTZ(toZonedTime(currentWeek, ARG_TZ), 'MMMM yyyy', { locale: es, timeZone: ARG_TZ })}
+                    </h2>
                     <p className="text-gray-400 font-medium text-sm">Gestiona la agenda y seguimiento de pacientes.</p>
                 </div>
                 <div className="flex items-center gap-3 justify-between sm:justify-end w-full sm:w-auto">
@@ -90,26 +92,34 @@ export default function WeeklyCalendar({ onOpenManual, onEditManual }: WeeklyCal
             {/* Mobile Day Selector */}
             <div className="md:hidden flex overflow-x-auto p-4 gap-3 bg-white scrollbar-hide border-b border-gray-50">
                 {days.map((day) => {
-                    const isSelected = isSameDay(day, selectedDay);
+                    const dayZoned = toZonedTime(day, ARG_TZ);
+                    const selZoned = toZonedTime(selectedDay, ARG_TZ);
+                    const isSelected = isSameDay(dayZoned, selZoned);
+                    
                     const hasAppts = appointments.some(a => {
                        if (!a.slots?.start_time) return false;
                        const apptZoned = toZonedTime(parseISO(a.slots.start_time), ARG_TZ);
-                       const dayZoned = toZonedTime(day, ARG_TZ);
                        return isSameDay(apptZoned, dayZoned);
                     });
+
                     return (
                         <button
                             key={day.toISOString()}
                             onClick={() => setSelectedDay(day)}
                             className={`flex flex-col items-center justify-center min-w-[64px] h-20 rounded-2xl transition-all relative ${isSelected ? 'bg-brand-primary text-white shadow-lg shadow-emerald-100' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'}`}
                         >
-                            <span className="text-[10px] font-black uppercase tracking-widest">{format(day, 'EEE', { locale: es })}</span>
-                            <span className="text-xl font-black mt-1">{format(day, 'd')}</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest">
+                                {formatTZ(dayZoned, 'EEE', { locale: es, timeZone: ARG_TZ })}
+                            </span>
+                            <span className="text-xl font-black mt-1">
+                                {formatTZ(dayZoned, 'd', { timeZone: ARG_TZ })}
+                            </span>
                             {hasAppts && !isSelected && <div className="absolute bottom-2 h-1.5 w-1.5 bg-brand-primary rounded-full" />}
                         </button>
                     );
                 })}
             </div>
+
 
 
             {/* Content Area */}
