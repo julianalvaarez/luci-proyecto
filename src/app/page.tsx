@@ -132,14 +132,14 @@ export default function LandingPage() {
                 title="Consulta Presencial"
                 icon={<MapPin className="h-6 w-6 text-brand-primary" />}
                 description="Te esperamos en nuestras sucursales de Palermo, Belgrano o Caballito."
-                price="$25.000"
+                price="$30.000"
                 href="/servicios/presencial"
               />
               <ServiceCard
                 title="Antropometría"
                 icon={<Calendar className="h-6 w-6 text-brand-primary" />}
                 description="Medición de composición corporal avanzada (solo presencial)."
-                price="$45.000"
+                price="$50.000"
                 href="/servicios/antropometria"
               />
             </div>
