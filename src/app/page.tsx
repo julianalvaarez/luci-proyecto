@@ -131,7 +131,7 @@ export default function LandingPage() {
               <ServiceCard
                 title="Consulta Presencial"
                 icon={<MapPin className="h-6 w-6 text-brand-primary" />}
-                description="Te esperamos en nuestras sucursales de Palermo, Belgrano o Caballito."
+                description="Te esperamos en nuestras sucursales."
                 price="$30.000"
                 href="/servicios/presencial"
               />

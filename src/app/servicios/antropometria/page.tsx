@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Dumbbell, TrendingUp } from 'lucide-react'; 
+import { ArrowLeft, Calendar, Dumbbell, TrendingUp } from 'lucide-react';
 import { Heart } from 'lucide-react';
 
 export default function AntropometriaPage() {
@@ -14,7 +14,7 @@ export default function AntropometriaPage() {
       </header>
 
       {/* Hero Section */}
-      <section 
+      <section
         className="relative h-64 md:h-80 w-full bg-cover bg-center flex flex-col justify-end p-6"
         style={{ backgroundImage: "url('https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80')" }}
       >
@@ -32,11 +32,11 @@ export default function AntropometriaPage() {
         <div className="bg-emerald-50 rounded-2xl p-5 mt-8 mb-8 border border-emerald-100 flex justify-between items-center shadow-sm">
           <div>
             <p className="text-xs text-brand-primary uppercase font-bold tracking-wide">INVERSIÓN POR SESIÓN</p>
-            <p className="text-3xl font-bold text-brand-primary mt-1">$90.000</p>
+            <p className="text-3xl font-bold text-brand-primary mt-1">$50.000</p>
           </div>
           <div className="text-right">
             <p className="text-xs text-gray-500">Duración estimada</p>
-            <p className="text-sm font-bold mt-1">45-60 minutos</p>
+            <p className="text-sm font-bold mt-1">60 minutos</p>
           </div>
         </div>
 

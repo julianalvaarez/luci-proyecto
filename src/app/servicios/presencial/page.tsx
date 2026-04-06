@@ -31,7 +31,7 @@ export default function PresencialPage() {
         <div className="bg-emerald-50 rounded-2xl p-5 mt-8 mb-8 border border-emerald-100 flex justify-between items-center shadow-sm">
           <div>
             <p className="text-[10px] text-brand-primary uppercase font-bold tracking-widest">INVERSIÓN POR SESIÓN</p>
-            <p className="text-4xl font-bold text-brand-primary mt-1">$55.000</p>
+            <p className="text-4xl font-bold text-brand-primary mt-1">$30.000</p>
           </div>
           <div className="text-right">
             <p className="text-[10px] text-gray-500 uppercase tracking-widest">Duración estimada</p>
@@ -84,32 +84,13 @@ export default function PresencialPage() {
 
           {/* Locations */}
           <div className='lg:flex-1'>
-            <h3 className="text-[22px] font-bold mb-1">Nuestras Sedes</h3>
-            <p className="text-gray-500 text-sm mb-5">Encuentra tu consultorio más cercano</p>
+            <h3 className="text-[22px] font-bold mb-1">Nuestra Sede</h3>
 
             <div className="space-y-3 mb-6">
               <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                <h4 className="font-bold text-gray-900">Palermo Soho</h4>
+                <h4 className="font-bold text-gray-900">Las Flores 542</h4>
                 <p className="text-sm text-gray-500 mb-3">Jorge Luis Borges 1900, CABA</p>
-                <a href="#" className="text-brand-primary text-[11px] font-bold tracking-widest uppercase flex items-center gap-1 hover:underline">
-                  VER EN GOOGLE MAPS
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              </div>
-
-              <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                <h4 className="font-bold text-gray-900">Belgrano</h4>
-                <p className="text-sm text-gray-500 mb-3">Av. Cabildo 2200, CABA</p>
-                <a href="#" className="text-brand-primary text-[11px] font-bold tracking-widest uppercase flex items-center gap-1 hover:underline">
-                  VER EN GOOGLE MAPS
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              </div>
-
-              <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                <h4 className="font-bold text-gray-900">Nordelta</h4>
-                <p className="text-sm text-gray-500 mb-3">Av. de los Lagos 6800, Tigre</p>
-                <a href="#" className="text-brand-primary text-[11px] font-bold tracking-widest uppercase flex items-center gap-1 hover:underline">
+                <a href="https://maps.app.goo.gl/uRRgYfbWRkPNV8BQA" className="text-brand-primary text-[11px] font-bold tracking-widest uppercase flex items-center gap-1 hover:underline">
                   VER EN GOOGLE MAPS
                   <ExternalLink className="h-3 w-3" />
                 </a>
@@ -119,7 +100,7 @@ export default function PresencialPage() {
         </div>
 
         <p className="text-xs text-gray-400 italic text-center mb-8 pb-4">
-          * Cualquier duda o consulta, no dudes en contactarnos al 11-2345-6789.
+          * Cualquier duda o consulta, no dudes en contactarnos al 11-6536-8186.
         </p>
       </main>
 

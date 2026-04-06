@@ -36,7 +36,7 @@ export default function OnlinePage() {
         <div className="bg-emerald-50 rounded-2xl p-5 my-6 border border-emerald-100 flex justify-between items-center shadow-sm">
           <div>
             <p className="text-xs text-brand-primary uppercase font-bold tracking-wide">INVERSIÓN POR SESIÓN</p>
-            <p className="text-4xl font-bold text-brand-primary mt-1">$45.000</p>
+            <p className="text-4xl font-bold text-brand-primary mt-1">$25.000</p>
           </div>
           <div className="text-right">
             <p className="text-xs text-gray-500 uppercase tracking-widest">Duración estimada</p>
