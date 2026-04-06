@@ -89,7 +89,6 @@ export default function PresencialPage() {
             <div className="space-y-3 mb-6">
               <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <h4 className="font-bold text-gray-900">Las Flores 542</h4>
-                <p className="text-sm text-gray-500 mb-3">Jorge Luis Borges 1900, CABA</p>
                 <a href="https://maps.app.goo.gl/uRRgYfbWRkPNV8BQA" className="text-brand-primary text-[11px] font-bold tracking-widest uppercase flex items-center gap-1 hover:underline">
                   VER EN GOOGLE MAPS
                   <ExternalLink className="h-3 w-3" />
