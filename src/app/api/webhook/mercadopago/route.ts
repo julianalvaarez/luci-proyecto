@@ -5,6 +5,8 @@ import { Resend } from 'resend';
 import { render } from '@react-email/render';
 import { AdminNotificationEmail } from '@/components/emails/AdminNotificationEmail';
 import React from 'react';
+import { formatInTimeZone } from 'date-fns-tz';
+import { es } from 'date-fns/locale';
 
 const client = new MercadoPagoConfig({
     accessToken: process.env.MP_ACCESS_TOKEN || '',
@@ -101,11 +103,29 @@ export async function POST(req: NextRequest) {
 
                 // D. Create Intake Form if First Time
                 if (bookingData.isFirstTime && bookingData.intakeData) {
-                    await supabase.from('intake_forms').insert({
+                    const rawData = bookingData.intakeData;
+                    const intakeData = {
                         appointment_id: appointment.id,
-                        ...bookingData.intakeData,
-                        age: bookingData.contactData?.age
-                    });
+                        diagnosed_diseases: rawData.diagnosed_diseases,
+                        blood_analysis_url: rawData.blood_analysis_url,
+                        objective: rawData.objective,
+                        medications: rawData.medications,
+                        physical_activity: rawData.physical_activity,
+                        age: bookingData.contactData?.age ? parseInt(bookingData.contactData.age) : null,
+                        weight: rawData.weight ? parseFloat(rawData.weight) : null,
+                        height: rawData.height ? parseFloat(rawData.height) : null,
+                        previous_nutritionist_visit: rawData.previous_nutritionist_visit === 'si'
+                    };
+
+                    const { error: intakeError } = await supabase
+                        .from('intake_forms')
+                        .insert(intakeData);
+
+                    if (intakeError) {
+                        console.error('Intake Form Insertion Error:', intakeError);
+                    } else {
+                        console.log('Intake Form inserted successfully');
+                    }
                 }
 
                 // E. Mark as paid
@@ -116,12 +136,21 @@ export async function POST(req: NextRequest) {
 
                 // F. Send Emails
                 try {
+                    const ARG_TZ = 'America/Argentina/Buenos_Aires';
                     const { data: service } = await supabase.from('services').select('name').eq('id', bookingData.serviceId).single();
                     const serviceName = service?.name || 'Consulta';
-                    const dateStr = start.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
-                    const timeStr = start.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+                    
+                    // Format dates specifically for Argentina
+                    const dateStr = formatInTimeZone(start, ARG_TZ, "EEEE d 'de' MMMM", { locale: es });
+                    const timeStr = formatInTimeZone(start, ARG_TZ, "HH:mm", { locale: es });
 
-                    console.log('Generating Admin Notification Email HTML...');
+                    console.log('Generating Admin Notification Email HTML for:', timeStr);
+                    
+                    // Map data for email display
+                    const emailIntakeData = bookingData.isFirstTime ? {
+                        ...bookingData.intakeData,
+                        age: bookingData.contactData?.age
+                    } : undefined;
                     const adminNotifyHtml = await render(
                         React.createElement(AdminNotificationEmail, {
                             patientName: `${bookingData.contactData.firstName} ${bookingData.contactData.lastName}`,
