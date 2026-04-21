@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, Calendar, MapPin, Video, CheckCircle } from 'lucide-react';
+import { Hero } from '@/components/ui/animated-hero';
 
 export default function LandingPage() {
   return (
@@ -28,35 +29,8 @@ export default function LandingPage() {
       </header>
 
       <main className="flex-1 relative z-10">
-        <section className="w-full min-h-[calc(100vh-64px)] flex items-center py-12 md:py-24 lg:py-32 xl:py-48 overflow-hidden bg-transparent">
-          <div className="container px-4 md:px-6 mx-auto relative z-10">
-            <div className="flex flex-col items-center space-y-6 text-center">
-              <div className="inline-block rounded-full bg-emerald-100/90 backdrop-blur-sm border border-emerald-200 px-4 py-1.5 text-sm text-emerald-800 font-bold shadow-sm">
-                Reserva tu turno online en segundos
-              </div>
-              <h1 className="text-4xl font-display font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-8xl max-w-4xl drop-shadow-sm text-gray-900 leading-[1.1]">
-                Tu salud merece un <span className="text-brand-primary drop-shadow-sm">plan a medida</span>
-              </h1>
-              <p className="mx-auto max-w-[750px] text-gray-700 md:text-xl font-medium leading-relaxed drop-shadow-sm px-4">
-                Agenda tu consulta nutricional de forma simple y rápida. Modalidad online o presencial en nuestras sucursales.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 mt-10">
-                <Link
-                  href="/booking"
-                  className="inline-flex h-14 items-center justify-center rounded-full bg-brand-primary px-10 text-base font-bold text-white shadow-xl transition-all hover:bg-brand-secondary hover:scale-105 active:scale-95 cursor-pointer"
-                >
-                  Agendar Turno
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-                <Link
-                  href="#services"
-                  className="inline-flex h-14 items-center justify-center rounded-full border border-gray-200 bg-white/80 backdrop-blur-md px-10 text-base font-bold shadow-lg transition-all hover:bg-white hover:scale-105 cursor-pointer"
-                >
-                  Ver Servicios
-                </Link>
-              </div>
-            </div>
-          </div>
+        <section className="w-full min-h-[calc(100vh-64px)] flex items-center overflow-hidden bg-transparent">
+          <Hero />
         </section>
 
         {/* Sobre Mí Section */}
