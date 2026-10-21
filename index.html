@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #070c16;
+        font-family: sans-serif;
+        color: #e8eaed;
+      }
+
+      .scene {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+
+      /* ── Scene 1: Hero ── */
+      #scene1 {
+        z-index: 1;
+        background: #070c16;
+      }
+      .s1-glow {
+        position: absolute;
+        width: 700px;
+        height: 700px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(16, 185, 129, 0) 70%);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .s1-glow2 {
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+        top: 15%;
+        right: 10%;
+      }
+      .s1-line-top {
+        position: absolute;
+        top: 80px;
+        left: 160px;
+        width: 120px;
+        height: 3px;
+        background: #10b981;
+      }
+      .s1-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 160px;
+        box-sizing: border-box;
+      }
+      .s1-tag {
+        font-size: 20px;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #10b981;
+        margin-bottom: 28px;
+      }
+      .s1-name {
+        font-family: serif;
+        font-size: 110px;
+        font-weight: 800;
+        line-height: 1.05;
+        color: #ffffff;
+        letter-spacing: -0.03em;
+        max-width: 900px;
+      }
+      .s1-sub {
+        font-size: 36px;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 24px;
+        max-width: 700px;
+      }
+      .s1-accent-bar {
+        position: absolute;
+        bottom: 120px;
+        left: 160px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .s1-accent-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #10b981;
+      }
+      .s1-accent-text {
+        font-size: 16px;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.5);
+        letter-spacing: 0.08em;
+      }
+      .s1-ghost {
+        position: absolute;
+        font-family: serif;
+        font-size: 320px;
+        font-weight: 900;
+        color: rgba(16, 185, 129, 0.03);
+        bottom: -60px;
+        right: -40px;
+        letter-spacing: -0.05em;
+        pointer-events: none;
+      }
+
+      /* ── Scene 2: Problem ── */
+      #scene2 {
+        z-index: 2;
+        background: #070c16;
+        opacity: 0;
+      }
+      .s2-grid-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image:
+          linear-gradient(rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
+        background-size: 80px 80px;
+      }
+      .s2-glow {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%);
+        top: 30%;
+        left: 60%;
+      }
+      .s2-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 160px;
+        box-sizing: border-box;
+      }
+      .s2-label {
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #ef4444;
+        margin-bottom: 32px;
+      }
+      .s2-question {
+        font-family: serif;
+        font-size: 76px;
+        font-weight: 700;
+        line-height: 1.15;
+        color: #ffffff;
+        letter-spacing: -0.02em;
+        max-width: 1000px;
+      }
+      .s2-desc {
+        font-size: 30px;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: 32px;
+        max-width: 800px;
+        line-height: 1.5;
+      }
+      .s2-icons {
+        position: absolute;
+        right: 160px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+      }
+      .s2-icon-card {
+        width: 140px;
+        height: 140px;
+        border-radius: 20px;
+        border: 2px solid rgba(239, 68, 68, 0.2);
+        background: rgba(239, 68, 68, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 56px;
+      }
+      .s2-line-left {
+        position: absolute;
+        left: 160px;
+        top: 80px;
+        width: 60px;
+        height: 3px;
+        background: #ef4444;
+      }
+
+      /* ── Scene 3: Services ── */
+      #scene3 {
+        z-index: 3;
+        background: #070c16;
+        opacity: 0;
+      }
+      .s3-glow {
+        position: absolute;
+        width: 800px;
+        height: 800px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+        top: -100px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .s3-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 80px 160px;
+        box-sizing: border-box;
+      }
+      .s3-header {
+        display: flex;
+        align-items: baseline;
+        gap: 24px;
+        margin-bottom: 16px;
+      }
+      .s3-label {
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #10b981;
+      }
+      .s3-title {
+        font-family: serif;
+        font-size: 72px;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -0.03em;
+      }
+      .s3-subtitle {
+        font-size: 26px;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.45);
+        margin-bottom: 56px;
+      }
+      .s3-cards {
+        display: flex;
+        gap: 32px;
+        flex: 1;
+      }
+      .s3-card {
+        flex: 1;
+        border-radius: 24px;
+        border: 2px solid rgba(16, 185, 129, 0.15);
+        background: rgba(16, 185, 129, 0.04);
+        padding: 48px 40px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+      }
+      .s3-card-icon {
+        font-size: 48px;
+        margin-bottom: 24px;
+      }
+      .s3-card-name {
+        font-family: serif;
+        font-size: 36px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 12px;
+      }
+      .s3-card-desc {
+        font-size: 20px;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.5);
+        line-height: 1.5;
+        margin-bottom: 28px;
+        flex: 1;
+      }
+      .s3-card-price {
+        font-size: 40px;
+        font-weight: 800;
+        color: #10b981;
+        font-variant-numeric: tabular-nums;
+      }
+      .s3-card-tag {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        padding: 6px 14px;
+        border-radius: 100px;
+      }
+
+      /* ── Scene 4: How it Works ── */
+      #scene4 {
+        z-index: 4;
+        background: #070c16;
+        opacity: 0;
+      }
+      .s4-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 160px;
+        box-sizing: border-box;
+      }
+      .s4-label {
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #10b981;
+        margin-bottom: 24px;
+      }
+      .s4-title {
+        font-family: serif;
+        font-size: 72px;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -0.03em;
+        margin-bottom: 64px;
+      }
+      .s4-steps {
+        display: flex;
+        gap: 48px;
+        align-items: flex-start;
+      }
+      .s4-step {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        position: relative;
+      }
+      .s4-step-num {
+        font-family: serif;
+        font-size: 80px;
+        font-weight: 900;
+        color: rgba(16, 185, 129, 0.15);
+        line-height: 1;
+        margin-bottom: 16px;
+      }
+      .s4-step-title {
+        font-size: 30px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 12px;
+      }
+      .s4-step-desc {
+        font-size: 20px;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.5);
+        line-height: 1.5;
+      }
+      .s4-connector {
+        position: absolute;
+        top: 40px;
+        right: -28px;
+        width: 48px;
+        height: 2px;
+        background: rgba(16, 185, 129, 0.3);
+      }
+      .s4-connector-arrow {
+        position: absolute;
+        top: -5px;
+        right: -2px;
+        width: 12px;
+        height: 12px;
+        border-right: 2px solid rgba(16, 185, 129, 0.3);
+        border-top: 2px solid rgba(16, 185, 129, 0.3);
+        transform: rotate(45deg);
+      }
+      .s4-bottom-line {
+        position: absolute;
+        bottom: 100px;
+        left: 160px;
+        right: 160px;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.3), transparent);
+      }
+      .s4-ghost {
+        position: absolute;
+        font-family: serif;
+        font-size: 260px;
+        font-weight: 900;
+        color: rgba(16, 185, 129, 0.025);
+        bottom: -40px;
+        right: 80px;
+        letter-spacing: -0.05em;
+        pointer-events: none;
+      }
+
+      /* ── Scene 5: CTA ── */
+      #scene5 {
+        z-index: 5;
+        background: #070c16;
+        opacity: 0;
+      }
+      .s5-glow {
+        position: absolute;
+        width: 900px;
+        height: 900px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0) 65%);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .s5-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0 200px;
+        box-sizing: border-box;
+      }
+      .s5-tag {
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #10b981;
+        margin-bottom: 32px;
+      }
+      .s5-title {
+        font-family: serif;
+        font-size: 96px;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        margin-bottom: 32px;
+      }
+      .s5-subtitle {
+        font-size: 30px;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.55);
+        margin-bottom: 56px;
+        max-width: 700px;
+        line-height: 1.5;
+      }
+      .s5-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 16px;
+        background: #10b981;
+        color: #070c16;
+        font-size: 28px;
+        font-weight: 700;
+        padding: 24px 56px;
+        border-radius: 100px;
+        letter-spacing: 0.02em;
+      }
+      .s5-cta-icon {
+        font-size: 32px;
+      }
+      .s5-footer {
+        position: absolute;
+        bottom: 60px;
+        font-size: 16px;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.25);
+        letter-spacing: 0.06em;
+      }
+      .s5-ring {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        border: 1px solid rgba(16, 185, 129, 0.08);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
+      .s5-ring2 {
+        position: absolute;
+        width: 420px;
+        height: 420px;
+        border-radius: 50%;
+        border: 1px solid rgba(16, 185, 129, 0.05);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-a58b" id="root" data-composition-id="luci-promo" data-width="1920" data-height="1080" data-start="0" data-duration="30">
+      <!-- Scene 1: Hero / Brand -->
+      <div data-hf-id="hf-zet7" id="scene1" class="scene">
+        <div data-hf-id="hf-4lxa" class="s1-glow"></div>
+        <div data-hf-id="hf-vle8" class="s1-glow2"></div>
+        <div data-hf-id="hf-unap" class="s1-line-top"></div>
+        <div data-hf-id="hf-bcs2" class="s1-ghost" data-layout-ignore="">LC</div>
+        <div data-hf-id="hf-kwf4" class="s1-content">
+          <div data-hf-id="hf-aml1" class="s1-tag">Nutrición Clinica</div>
+          <div data-hf-id="hf-jgya" class="s1-name">Lic. Luciana<br data-hf-id="hf-x5px">Cresia</div>
+          <div data-hf-id="hf-km3w" class="s1-sub">Turnos online y presenciales para tu bienestar</div>
+        </div>
+        <div data-hf-id="hf-ic4n" class="s1-accent-bar">
+          <div data-hf-id="hf-anh1" class="s1-accent-dot"></div>
+          <div data-hf-id="hf-x1aj" class="s1-accent-text">Wilde, Buenos Aires · Mat. Nac. 12135</div>
+        </div>
+      </div>
+
+      <!-- Scene 2: Problem -->
+      <div data-hf-id="hf-qqxc" id="scene2" class="scene">
+        <div data-hf-id="hf-fol8" class="s2-grid-bg"></div>
+        <div data-hf-id="hf-nmmf" class="s2-glow"></div>
+        <div data-hf-id="hf-exjo" class="s2-line-left"></div>
+        <div data-hf-id="hf-wwfv" class="s2-content">
+          <div data-hf-id="hf-rmz3" class="s2-label">El problema</div>
+          <div data-hf-id="hf-br79" class="s2-question">¿Coordina turnos por WhatsApp y pierde tiempo?</div>
+          <div data-hf-id="hf-uf25" class="s2-desc">Pacientes que no confirman, horarios que se pisan, y formularios que llegan por correo. Todo manual, nada automatizado.</div>
+        </div>
+        <div data-hf-id="hf-0b6m" class="s2-icons">
+          <div data-hf-id="hf-c4uc" class="s2-icon-card">📱</div>
+          <div data-hf-id="hf-g9uu" class="s2-icon-card">⏰</div>
+          <div data-hf-id="hf-oxk2" class="s2-icon-card">📋</div>
+        </div>
+      </div>
+
+      <!-- Scene 3: Services -->
+      <div data-hf-id="hf-db6s" id="scene3" class="scene" data-layout-allow-overflow="">
+        <div data-hf-id="hf-gyzl" class="s3-glow" data-layout-allow-overflow=""></div>
+        <div data-hf-id="hf-2tii" class="s3-content">
+          <div data-hf-id="hf-dobo" class="s3-header">
+            <div data-hf-id="hf-3c5g" class="s3-label">Servicios</div>
+          </div>
+          <div data-hf-id="hf-legn" class="s3-title">Todo en un solo lugar</div>
+          <div data-hf-id="hf-ft61" class="s3-subtitle">Reservá tu consulta de forma simple y rápida</div>
+          <div data-hf-id="hf-lx14" class="s3-cards">
+            <div data-hf-id="hf-lk15" class="s3-card">
+              <div data-hf-id="hf-em9x" class="s3-card-tag">Online</div>
+              <div data-hf-id="hf-ksdd" class="s3-card-icon">💻</div>
+              <div data-hf-id="hf-1toj" class="s3-card-name">Consulta Online</div>
+              <div data-hf-id="hf-9dh1" class="s3-card-desc">Videollamada de 60 minutos desde la comodidad de tu hogar</div>
+              <div data-hf-id="hf-5bd4" class="s3-card-price">$25.000</div>
+            </div>
+            <div data-hf-id="hf-4plp" class="s3-card">
+              <div data-hf-id="hf-ay62" class="s3-card-tag">Presencial</div>
+              <div data-hf-id="hf-ylj6" class="s3-card-icon">🏥</div>
+              <div data-hf-id="hf-z9nw" class="s3-card-name">Consulta Presencial</div>
+              <div data-hf-id="hf-tw4t" class="s3-card-desc">Atención en consultorio, Las Flores 542, Wilde</div>
+              <div data-hf-id="hf-vqc2" class="s3-card-price">$30.000</div>
+            </div>
+            <div data-hf-id="hf-5wis" class="s3-card">
+              <div data-hf-id="hf-k32s" class="s3-card-tag">Especial</div>
+              <div data-hf-id="hf-vd4g" class="s3-card-icon">📐</div>
+              <div data-hf-id="hf-iws8" class="s3-card-name">Antropometría ISAK</div>
+              <div data-hf-id="hf-8sxo" class="s3-card-desc">Análisis de composición corporal con certificación ISAK</div>
+              <div data-hf-id="hf-i290" class="s3-card-price">$50.000</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 4: How it Works -->
+      <div data-hf-id="hf-0sob" id="scene4" class="scene" data-layout-allow-overflow="">
+        <div data-hf-id="hf-eq11" class="s4-content">
+          <div data-hf-id="hf-g02p" class="s4-label">Cómo funciona</div>
+          <div data-hf-id="hf-1eb4" class="s4-title">Reservá en 3 pasos</div>
+          <div data-hf-id="hf-jecv" class="s4-steps">
+            <div data-hf-id="hf-i5bo" class="s4-step">
+              <div data-hf-id="hf-ho8w" class="s4-step-num">01</div>
+              <div data-hf-id="hf-j6wy" class="s4-step-title">Elegí tu servicio</div>
+              <div data-hf-id="hf-azz4" class="s4-step-desc">Seleccioná entre consulta online, presencial o antropometría</div>
+              <div data-hf-id="hf-6243" class="s4-connector"><div data-hf-id="hf-js9b" class="s4-connector-arrow"></div></div>
+            </div>
+            <div data-hf-id="hf-r6a4" class="s4-step">
+              <div data-hf-id="hf-ghbt" class="s4-step-num">02</div>
+              <div data-hf-id="hf-fmyf" class="s4-step-title">Elegí fecha y hora</div>
+              <div data-hf-id="hf-uu66" class="s4-step-desc">Elegí el día y horario que mejor se adapte a tu rutina</div>
+              <div data-hf-id="hf-sln7" class="s4-connector"><div data-hf-id="hf-ogdr" class="s4-connector-arrow"></div></div>
+            </div>
+            <div data-hf-id="hf-pzd1" class="s4-step">
+              <div data-hf-id="hf-gvmu" class="s4-step-num">03</div>
+              <div data-hf-id="hf-71xw" class="s4-step-title">Confirmá y listo</div>
+              <div data-hf-id="hf-qld8" class="s4-step-desc">Completá tus datos, subí el comprobante y recibí la confirmación</div>
+            </div>
+          </div>
+        </div>
+        <div data-hf-id="hf-9vhq" class="s4-bottom-line"></div>
+        <div data-hf-id="hf-us7r" class="s4-ghost" data-layout-ignore="">3</div>
+      </div>
+
+      <!-- Scene 5: CTA -->
+      <div data-hf-id="hf-kl7j" id="scene5" class="scene">
+        <div data-hf-id="hf-2o1u" class="s5-glow"></div>
+        <div data-hf-id="hf-if0n" class="s5-ring"></div>
+        <div data-hf-id="hf-m20f" class="s5-ring2"></div>
+        <div data-hf-id="hf-kry4" class="s5-content">
+          <div data-hf-id="hf-wjiq" class="s5-tag">Reservá ahora</div>
+          <div data-hf-id="hf-std3" class="s5-title">Tu salud no puede esperar</div>
+          <div data-hf-id="hf-gwr9" class="s5-subtitle">Elegí tu turno en segundos y empezá tu camino hacia una mejor alimentación</div>
+          <div data-hf-id="hf-mp7j" class="s5-cta">
+            <span data-hf-id="hf-3l9p" class="s5-cta-icon" data-layout-ignore="">📅</span>
+            Reservar Turno
+          </div>
+        </div>
+        <div data-hf-id="hf-xq7k" class="s5-footer">liclucianacresia.com.ar</div>
+      </div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      var S1 = 0, S2 = 6, S3 = 12.5, S4 = 20, S5 = 26;
+      var TR = 0.6;
+
+      // ── Scene 1: Hero Entrance ──
+      tl.fromTo("#scene1 .s1-tag", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, S1 + 0.2);
+      tl.fromTo("#scene1 .s1-name", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, S1 + 0.35);
+      tl.fromTo("#scene1 .s1-sub", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, S1 + 0.6);
+      tl.fromTo("#scene1 .s1-line-top", { scaleX: 0, transformOrigin: "left" }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, S1 + 0.15);
+      tl.fromTo("#scene1 .s1-accent-bar", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, S1 + 0.8);
+      tl.fromTo("#scene1 .s1-glow", { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.2, ease: "power1.out" }, S1 + 0.1);
+
+      // Ambient glow pulse on Scene 1
+      tl.to("#scene1 .s1-glow", { scale: 1.08, yoyo: true, repeat: 3, duration: 1.5, ease: "sine.inOut", overwrite: "auto" }, S1 + 0.5);
+
+      // ── Transition 1→2: Blur Crossfade ──
+      tl.to("#scene1", { filter: "blur(12px)", scale: 1.03, duration: TR, ease: "power2.in" }, S2 - TR);
+      tl.to("#scene1", { opacity: 0, duration: TR * 0.6, ease: "power2.in" }, S2 - TR * 0.4);
+      tl.set("#scene1", { visibility: "hidden" }, S2);
+      tl.fromTo("#scene2", { filter: "blur(12px)", scale: 0.97, opacity: 0 }, { filter: "blur(0px)", scale: 1, opacity: 1, duration: TR, ease: "power2.out" }, S2);
+
+      // ── Scene 2: Problem Entrance ──
+      tl.fromTo("#scene2 .s2-label", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, S2 + 0.2);
+      tl.fromTo("#scene2 .s2-question", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, S2 + 0.35);
+      tl.fromTo("#scene2 .s2-desc", { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, S2 + 0.55);
+      tl.fromTo("#scene2 .s2-line-left", { scaleX: 0, transformOrigin: "left" }, { scaleX: 1, duration: 0.4, ease: "power2.out" }, S2 + 0.15);
+      tl.fromTo("#scene2 .s2-icon-card", { opacity: 0, x: 40, stagger: 0.15 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, S2 + 0.4);
+
+      // Ambient grid pulse
+      tl.to("#scene2 .s2-grid-bg", { opacity: 0.6, yoyo: true, repeat: 2, duration: 2, ease: "sine.inOut" }, S2 + 0.5);
+
+      // ── Transition 2→3: Blur Crossfade ──
+      tl.to("#scene2", { filter: "blur(12px)", scale: 1.03, duration: TR, ease: "power2.in" }, S3 - TR);
+      tl.to("#scene2", { opacity: 0, duration: TR * 0.6, ease: "power2.in" }, S3 - TR * 0.4);
+      tl.set("#scene2", { visibility: "hidden" }, S3);
+      tl.fromTo("#scene3", { filter: "blur(12px)", scale: 0.97, opacity: 0 }, { filter: "blur(0px)", scale: 1, opacity: 1, duration: TR, ease: "power2.out" }, S3);
+
+      // ── Scene 3: Services Entrance ──
+      tl.fromTo("#scene3 .s3-label", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, S3 + 0.2);
+      tl.fromTo("#scene3 .s3-title", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, S3 + 0.3);
+      tl.fromTo("#scene3 .s3-subtitle", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, S3 + 0.5);
+      tl.fromTo("#scene3 .s3-card", { opacity: 0, y: 50, stagger: 0.18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, S3 + 0.55);
+
+      // Ambient glow on Scene 3
+      tl.to("#scene3 .s3-glow", { scale: 1.1, yoyo: true, repeat: 2, duration: 2, ease: "sine.inOut" }, S3 + 0.5);
+
+      // ── Transition 3→4: Push Slide ──
+      tl.to("#scene3", { x: -1920, duration: 0.5, ease: "power3.inOut" }, S4 - 0.5);
+      tl.fromTo("#scene4", { x: 1920, opacity: 1 }, { x: 0, duration: 0.5, ease: "power3.inOut" }, S4 - 0.5);
+
+      // ── Scene 4: How it Works Entrance ──
+      tl.fromTo("#scene4 .s4-label", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, S4 + 0.2);
+      tl.fromTo("#scene4 .s4-title", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, S4 + 0.3);
+      tl.fromTo("#scene4 .s4-step-num", { opacity: 0, scale: 0.7, stagger: 0.2 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.5)" }, S4 + 0.5);
+      tl.fromTo("#scene4 .s4-step-title", { opacity: 0, y: 20, stagger: 0.2 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, S4 + 0.7);
+      tl.fromTo("#scene4 .s4-step-desc", { opacity: 0, y: 15, stagger: 0.2 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, S4 + 0.85);
+      tl.fromTo("#scene4 .s4-connector", { scaleX: 0, transformOrigin: "left", stagger: 0.2 }, { scaleX: 1, duration: 0.3, ease: "power2.out" }, S4 + 0.9);
+      tl.fromTo("#scene4 .s4-bottom-line", { scaleX: 0, transformOrigin: "left" }, { scaleX: 1, duration: 0.6, ease: "power2.out" }, S4 + 0.5);
+
+      // ── Transition 4→5: Blur Crossfade (gentle for outro) ──
+      tl.to("#scene4", { filter: "blur(15px)", scale: 1.04, duration: 0.7, ease: "power1.in" }, S5 - 0.7);
+      tl.to("#scene4", { opacity: 0, duration: 0.5, ease: "power1.in" }, S5 - 0.4);
+      tl.set("#scene4", { visibility: "hidden" }, S5);
+      tl.fromTo("#scene5", { filter: "blur(15px)", scale: 0.96, opacity: 0 }, { filter: "blur(0px)", scale: 1, opacity: 1, duration: 0.7, ease: "power1.out" }, S5);
+
+      // ── Scene 5: CTA Entrance ──
+      tl.fromTo("#scene5 .s5-tag", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, S5 + 0.2);
+      tl.fromTo("#scene5 .s5-title", { opacity: 0, y: 40, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "power3.out" }, S5 + 0.3);
+      tl.fromTo("#scene5 .s5-subtitle", { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, S5 + 0.55);
+      tl.fromTo("#scene5 .s5-cta", { opacity: 0, y: 30, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, S5 + 0.7);
+      tl.fromTo("#scene5 .s5-footer", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, S5 + 0.9);
+
+      // Ambient rings
+      tl.to("#scene5 .s5-ring", { scale: 1.06, opacity: 0.4, yoyo: true, repeat: 1, duration: 1.8, ease: "sine.inOut" }, S5 + 0.5);
+      tl.to("#scene5 .s5-ring2", { scale: 1.1, opacity: 0.3, yoyo: true, repeat: 1, duration: 2, ease: "sine.inOut" }, S5 + 0.7);
+
+      // CTA pulse
+      tl.to("#scene5 .s5-cta", { scale: 1.04, yoyo: true, repeat: 2, duration: 0.8, ease: "sine.inOut" }, S5 + 1.2);
+
+      window.__timelines["luci-promo"] = tl;
+    </script>
+  </body>
+</html>
